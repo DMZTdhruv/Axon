@@ -1,0 +1,150 @@
+import { UserRepository } from "../repository/user.repository.js";
+import type { TUser } from "../types/types.js";
+import type { TAxonResponse, TResponse } from "../utils/axonResponse.js";
+import axonResponse from "../utils/axonResponse.js";
+import { checkHashPassword } from "../utils/hash.utils.js";
+import { generateJsonWebToken } from "../utils/jwt.utils.js";
+import { validateSingUpDetails, validateUserLogin } from "../validators/user.validator.js";
+
+const userRepo = new UserRepository();
+
+interface IUserServiceReturn {
+	jwtToken: string;
+	axonResponse: TAxonResponse;
+}
+
+export const userSignUpService = async (userData: TUser): Promise<IUserServiceReturn> => {
+	try {
+		// validate user data
+		const validation = validateSingUpDetails(userData);
+		if (validation.error) {
+			const response: TResponse = {
+				message: validation.errorMessage,
+				success: false,
+				data: null,
+			};
+			return {
+				jwtToken: "",
+				axonResponse: axonResponse(400, response),
+			};
+		}
+
+		// check if the user exists
+		const userExist = await userRepo.getUserByEmail(userData.email);
+		if (userExist?._id) {
+			const response: TResponse = {
+				message: "user already exists",
+				success: false,
+				data: userExist,
+			};
+			return {
+				jwtToken: "",
+				axonResponse: axonResponse(400, response),
+			};
+		}
+
+		// create a new user
+		const newUser = await userRepo.createUser(userData);
+		const response: TResponse = {
+			message: "new user created",
+			success: true,
+			data: newUser,
+		};
+
+		console.log("new user created", newUser);
+		const jwtToken = generateJsonWebToken(response.data);
+		return {
+			jwtToken,
+			axonResponse: axonResponse(201, response),
+		};
+	} catch (error) {
+		if (error instanceof Error) console.log("Error occurred in sign up service", error.message);
+		const response: TResponse = {
+			message: error instanceof Error ? error.message : "An unknown error occurred",
+			success: false,
+			data: null,
+		};
+		return {
+			jwtToken: "",
+			axonResponse: axonResponse(500, response),
+		};
+	}
+};
+
+//logging in service
+export const userSignInService = async (userData: TUser): Promise<IUserServiceReturn> => {
+	try {
+		//validating user data
+		const validation = validateUserLogin(userData);
+		if (validation.error) {
+			const response: TResponse = {
+				message: validation.errorMessage,
+				success: false,
+				data: null,
+			};
+			return {
+				jwtToken: "",
+				axonResponse: axonResponse(400, response),
+			};
+		}
+
+		//checking if user exist first
+		const userExist = await userRepo.getUserByEmailWithPassword(userData.email);
+		if (!userExist) {
+			const response: TResponse = {
+				message: "user doesn't exists",
+				success: false,
+				data: null,
+			};
+			return {
+				jwtToken: "",
+				axonResponse: axonResponse(400, response),
+			};
+		}
+
+
+		// checking the password 
+		if (!await checkHashPassword(userData.password, userExist.password)) {
+			const response: TResponse = {
+				message: "invalid credentials",
+				success: false,
+				data: null,
+			};
+			return {
+				jwtToken: "",
+				axonResponse: axonResponse(403, response),
+			};
+		}
+
+		const userDataResponse: Omit<TUser, "password"> = {
+			_id: userExist._id as string,
+			username: userExist.username,
+			email: userExist.email,
+			userImage: userExist.userImage,
+		}
+
+		// generating a jwt token
+		const jwtToken = generateJsonWebToken(userDataResponse);
+
+		const response: TResponse = {
+			message: "signed in successfully",
+			success: true,
+			data: userDataResponse,
+		};
+		return {
+			jwtToken: jwtToken,
+			axonResponse: axonResponse(200, response),
+		};
+	} catch (error) {
+		if (error instanceof Error) console.log("Error occurred in logging service", error.message);
+		const response: TResponse = {
+			message: error instanceof Error ? error.message : "An unknown error occurred",
+			success: false,
+			data: null,
+		};
+		return {
+			jwtToken: "",
+			axonResponse: axonResponse(500, response),
+		};
+	}
+};

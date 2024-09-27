@@ -6,7 +6,7 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 
 const WorkspaceCover = ({ currentWorkspace }: { currentWorkspace: IUserWorkspace }) => {
   const currentWorkspaceTitle = currentWorkspace.title ? currentWorkspace.title : "Untitled";
-  const [yPos, setYPos] = useState<number>(50);
+  const [yPos, setYPos] = useState<number>(currentWorkspace.coverPos);
 
   const workspace = useWorkspaceStore();
 
@@ -19,6 +19,7 @@ const WorkspaceCover = ({ currentWorkspace }: { currentWorkspace: IUserWorkspace
   };
 
   const handleTheYPos = (yPos: number) => {
+    setYPos(() => yPos);
     workspace.updateWorkspaceCoverYPosition(currentWorkspace._id, currentWorkspace.workspace, yPos);
   };
 
@@ -32,14 +33,6 @@ const WorkspaceCover = ({ currentWorkspace }: { currentWorkspace: IUserWorkspace
         <div className="absolute top-0 z-[10] w-full left-0">
           <div className="h-full relative opacity-0 group-hover:opacity-100 transition-all  w-full">
             <div className="flex gap-2 absolute top-[24px] right-[24px]">
-              {currentWorkspace.cover && (
-                <button
-                  type="button"
-                  className="bg-[#262626]/50 hover:bg-[#262626]  backdrop-blur-lg transition-all text-[13px] rounded-xl px-[10px] py-[8px]"
-                >
-                  Reposition
-                </button>
-              )}
               <label className="bg-[#262626]/50 hover:bg-[#262626] backdrop-blur-lg  transition-all text-[13px] rounded-xl px-[10px] py-[8px]">
                 <input type="file" accept="image/*" onChange={handleImageChange} className=" hidden w-0 h-0" />
                 {currentWorkspace.cover ? "Change cover" : "Upload an image"}
@@ -62,7 +55,7 @@ const WorkspaceCover = ({ currentWorkspace }: { currentWorkspace: IUserWorkspace
           />
         )}
         {/* Limit yPos to stay within 0-100% range */}
-        <div className="absolute bottom-[20px] flex flex-col gap-2 right-[24px] z-[10]">
+        <div className="absolute opacity-0 group-hover:opacity-100 bottom-[24px] flex flex-col gap-2 right-[24px] z-[10]">
           <button
             onClick={() => handleTheYPos(Math.max(0, Math.min(currentWorkspace.coverPos - 10, 100)))}
             type="button"

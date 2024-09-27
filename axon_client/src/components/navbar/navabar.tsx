@@ -1,5 +1,4 @@
-import type { TMenuItem, TWorkspaceItems } from "@/types";
-import React from "react";
+import type { TMenuItem } from "@/types";
 import NavLink from "./navlink";
 import NavbarHeader from "./NavbarHeader";
 import WorkspaceSection from "./WorkspaceSection";
@@ -8,13 +7,13 @@ import Search from "./Search";
 const Navbar = () => {
 	const menuItems: TMenuItem[] = [
 		{
-			_id: "hello",
+			_id: "home_id",
 			icon: "homeIcon.svg",
 			title: "Home",
-			url: "home",
+			url: "",
 		},
 		{
-			_id: "hello",
+			_id: "setting_id",
 			icon: "settingIcon.svg",
 			title: "Settings",
 			url: "setting",

@@ -31,7 +31,7 @@ export interface IUserWorkspace {
 	icon: string | undefined;
 	cover: string | undefined;
 	coverPos: number;
-	workspace: string;
+	workspace: "main" | "everything";
 	members: TAuthUser[] | null;
 	parentPageId: string | null;
 	childPageId: string | null;
@@ -73,8 +73,20 @@ interface IUserWorkspaceStore {
 		workspaceType: string,
 		yPos: number,
 	) => void;
-	addNewSubWorkspaceById: (workspaceId: string, workspaceType: string) => void;
-	removeWorkspace: (workspaceId: string, workspaceType: string) => void;
+	addNewSubWorkspaceById: (
+		workspaceId: string,
+		workspaceType: "main" | "everything",
+	) => void;
+	removeWorkspace: (
+		workspaceId: string,
+		workspaceType: "main" | "everything",
+	) => void;
+	pushWorkspaceToDifferentWorkspace: (
+		currentWorkspaceId: string,
+		toWorkspaceId: string,
+		workspaceType: "main" | "everything",
+		toWorkspaceType: "main" | "everything",
+	) => void;
 }
 
 export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
@@ -290,6 +302,89 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 		}
 	},
 
+	pushWorkspaceToDifferentWorkspace: (
+		currentWorkspaceId: string,
+		toWorkspaceId: string,
+		workspaceType: "main" | "everything",
+		toWorkspaceType: "main" | "everything",
+	) => {
+		set((state) => {
+			const findWorkspaceAndRemove = (
+				workspaces: IUserWorkspace[],
+				currentWorkspaceId: string,
+			): IUserWorkspace | undefined => {
+				for (let i = 0; i < workspaces.length; i++) {
+					if (workspaces[i]._id === currentWorkspaceId) {
+						return workspaces.splice(i, 1)[0];
+					}
+					if (workspaces[i].subPages && workspaces[i].subPages.length > 0) {
+						const subWorkspace = findWorkspaceAndRemove(
+							workspaces[i].subPages,
+							currentWorkspaceId,
+						);
+						if (subWorkspace) return subWorkspace;
+					}
+				}
+				return undefined;
+			};
+
+			const findToWorkspaceLocation = (
+				workspaces: IUserWorkspace[],
+				toWorkspaceId: string,
+			): IUserWorkspace | undefined => {
+				for (let i = 0; i < workspaces.length; i++) {
+					if (workspaces[i]._id === toWorkspaceId) {
+						return workspaces[i];
+					}
+					if (workspaces[i].subPages && workspaces[i].subPages.length > 0) {
+						const subWorkspace = findToWorkspaceLocation(
+							workspaces[i].subPages,
+							toWorkspaceId,
+						);
+						if (subWorkspace) return subWorkspace;
+					}
+				}
+				return undefined;
+			};
+
+			const workspaceToMove = findWorkspaceAndRemove(
+				[...state.workspace[workspaceType]],
+				currentWorkspaceId,
+			);
+
+			if (!workspaceToMove) {
+				return state;
+			}
+
+			workspaceToMove.workspace = toWorkspaceType;
+
+			const newWorkspaceState = {
+				...state.workspace,
+				[workspaceType]: [...state.workspace[workspaceType]],
+				[toWorkspaceType]: [...state.workspace[toWorkspaceType]],
+			};
+
+			const newWorkspaceLocation = findToWorkspaceLocation(
+				newWorkspaceState[toWorkspaceType],
+				toWorkspaceId,
+			);
+
+			if (!newWorkspaceLocation) {
+				return state;
+			}
+
+			newWorkspaceLocation.subPages = [
+				workspaceToMove,
+				...newWorkspaceLocation.subPages,
+			];
+
+			return {
+				...state,
+				workspace: newWorkspaceState,
+			};
+		});
+	},
+
 	addNewRecentWorkspace: (
 		workspaceId: string,
 		workspaceType: string,
@@ -308,18 +403,19 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 		set((state) => ({
 			workspace: {
 				...state.workspace,
-				recent: state.workspace.recent ? (
-					state.workspace.recent.length < 5 ? (
-						[newVisitedWorkspace, ...state.workspace.recent]
-					) : (
-						[newVisitedWorkspace, ...state.workspace.recent.slice(0,-1)]
-					)
-				) : [newVisitedWorkspace]
-			}
-		}))
+				recent: state.workspace.recent
+					? state.workspace.recent.length < 5
+						? [newVisitedWorkspace, ...state.workspace.recent]
+						: [newVisitedWorkspace, ...state.workspace.recent.slice(0, -1)]
+					: [newVisitedWorkspace],
+			},
+		}));
 	},
 
-	addNewSubWorkspaceById: (workspaceId: string, workspaceType: string) => {
+	addNewSubWorkspaceById: (
+		workspaceId: string,
+		workspaceType: "main" | "everything",
+	) => {
 		if (workspaceType === "main") {
 			set((state) => ({
 				workspace: {
@@ -345,7 +441,10 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 		}
 	},
 
-	removeWorkspace: (workspaceId: string, workspaceType: string) => {
+	removeWorkspace: (
+		workspaceId: string,
+		workspaceType: "main" | "everything",
+	) => {
 		if (workspaceType === "main") {
 			set((state) => ({
 				workspace: {
@@ -575,12 +674,10 @@ const removeWorkspaceById = (
 ): IUserWorkspace[] => {
 	return workspaces.reduce((acc: IUserWorkspace[], workspace) => {
 		if (workspace._id === workspaceId) {
-			// Skip this workspace (effectively removing it)
 			return acc;
 		}
 
 		if (workspace.subPages) {
-			// Recursively remove from subPages
 			return [
 				// biome-ignore lint/performance/noAccumulatingSpread: <explanation>
 				...acc,
@@ -591,15 +688,15 @@ const removeWorkspaceById = (
 			];
 		}
 
-		// Keep this workspace
 		// biome-ignore lint/performance/noAccumulatingSpread: <explanation>
 		return [...acc, workspace];
 	}, []);
 };
+
 const addNewSubWorkspaceToParent = (
 	workspaces: IUserWorkspace[],
 	workspaceId: string,
-	workspaceType: string,
+	workspaceType: "main" | "everything",
 ): IUserWorkspace[] => {
 	const newWorkspace: IUserWorkspace = {
 		_id: Math.random().toString(36).substring(2, 9),

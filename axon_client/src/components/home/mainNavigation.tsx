@@ -6,9 +6,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 const MainNavigation = () => {
-	const mainWorkspaces = useWorkspaceStore();
+	const workspaceStore = useWorkspaceStore();
 	const mainWorkspaceList: TNavigationWorkspaceContent[] =
-		mainWorkspaces.workspace.main.map((workspace) => {
+		workspaceStore.workspace.main.map((workspace) => {
 			return {
 				_id: workspace._id,
 				title: workspace.title,
@@ -18,7 +18,7 @@ const MainNavigation = () => {
 			};
 		});
 	const everythingWorkspaceList: TNavigationWorkspaceContent[] =
-		mainWorkspaces.workspace.everything.map((workspace) => {
+		workspaceStore.workspace.everything.map((workspace) => {
 			return {
 				_id: workspace._id,
 				title: workspace.title,
@@ -64,9 +64,34 @@ const MainNavigation = () => {
 						))}
 					</div>
 				</div>
-				<div className="flex flex-col gap-[10px]">
-					<p className="text-[#595959] text-[13px]">Recently visited</p>
-				</div>
+				{workspaceStore.workspace.recent && (
+					<div className="flex flex-col gap-[10px]">
+						<p className="text-[#595959] text-[13px]">Recently visited</p>
+						<div className="flex gap-[10px] -translate-x-[5px]">
+							{workspaceStore.workspace.recent.map((recentWorkspace) => {
+								return (
+									<Link
+										key={recentWorkspace._id}
+										href={`/workspace/${recentWorkspace.workspaceType}/${recentWorkspace._id}`}
+										className="flex items-center hover:bg-neutral-800 transition-all rounded-lg px-2 py-1 gap-[10px]"
+									>
+										<Image
+											alt={`nav_${recentWorkspace.title}`}
+											src={`/assets/${recentWorkspace.icon}`}
+											height={16}
+											width={16}
+											unoptimized
+											className=" -translate-y-[1px]"
+										/>
+										<span className="text-[15px]  leading-tight">
+											{recentWorkspace.title}
+										</span>
+									</Link>
+								);
+							})}
+						</div>
+					</div>
+				)}
 			</div>
 		</div>
 	);
@@ -79,8 +104,19 @@ const NavItems = ({
 	icon,
 	workspaceType,
 }: TNavigationWorkspaceContent) => {
+	const workspaceStore = useWorkspaceStore();
+
 	return (
 		<Link
+			onClick={() => {
+				workspaceStore.addNewRecentWorkspace(
+					_id,
+					workspaceType,
+					title ? title : "undefined",
+					icon ? icon : "axon_logo.svg",
+					cover ? cover : "",
+				);
+			}}
 			href={`/workspace/${workspaceType}/${_id}`}
 			className="flex items-center hover:bg-neutral-800 transition-all rounded-lg px-2 py-1 gap-[10px]"
 		>

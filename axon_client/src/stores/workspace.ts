@@ -1,4 +1,5 @@
-import type { TAuthUser } from "@/types";
+import WorkspaceCover from "@/components/workspace/WorkspaceCover";
+import type { TAuthUser, TNavigationWorkspaceContent } from "@/types";
 import type { JSONContent } from "novel";
 import { create } from "zustand";
 
@@ -39,13 +40,19 @@ export interface IUserWorkspace {
 	content: JSONContent | undefined;
 }
 
-
-
 interface IUserWorkspaceStore {
 	workspace: {
 		main: IUserWorkspace[];
 		everything: IUserWorkspace[];
+		recent: TNavigationWorkspaceContent[] | undefined;
 	};
+	addNewRecentWorkspace: (
+		workspaceId: string,
+		workspaceType: string,
+		workspaceTitle: string,
+		workspaceIcon: string,
+		workspaceCover: string,
+	) => void;
 	updateWorkspaceTitleById: (
 		workspaceId: string,
 		title: string,
@@ -250,6 +257,7 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 				subPages: [],
 			},
 		],
+		recent: undefined,
 	},
 
 	updateWorkspaceTitleById: (
@@ -280,6 +288,35 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 				},
 			}));
 		}
+	},
+
+	addNewRecentWorkspace: (
+		workspaceId: string,
+		workspaceType: string,
+		workspaceTitle: string,
+		workspaceIcon: string,
+		workspaceCover: string,
+	) => {
+		const newVisitedWorkspace: TNavigationWorkspaceContent = {
+			_id: workspaceId,
+			icon: workspaceIcon,
+			cover: workspaceCover,
+			title: workspaceTitle,
+			workspaceType: workspaceType,
+		};
+
+		set((state) => ({
+			workspace: {
+				...state.workspace,
+				recent: state.workspace.recent ? (
+					state.workspace.recent.length < 5 ? (
+						[newVisitedWorkspace, ...state.workspace.recent]
+					) : (
+						[newVisitedWorkspace, ...state.workspace.recent.slice(0,-1)]
+					)
+				) : [newVisitedWorkspace]
+			}
+		}))
 	},
 
 	addNewSubWorkspaceById: (workspaceId: string, workspaceType: string) => {

@@ -117,6 +117,7 @@ export const suggestionItems = createSuggestionItems([
 		icon: <Image size={18} />,
 		description: "Add an image to your page.",
 		command: ({ editor, range }) => {
+			editor.chain().focus().deleteRange(range).run();
 			const element = document.createElement("input");
 			element.type = "file";
 			element.accept = "image/*";
@@ -138,9 +139,8 @@ export const suggestionItems = createSuggestionItems([
 		searchTerms: ["codeblock"],
 		icon: <Code size={18} />,
 		command: ({ editor, range }) =>
-      
 			editor.chain().focus().deleteRange(range).toggleCodeBlock().run(),
-	  },
+	},
 	{
 		title: "New page",
 		description: "Create a new page",

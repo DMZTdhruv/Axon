@@ -57,10 +57,6 @@ const AxonEditor = ({
 		500,
 	);
 
-	useEffect(() => {
-		console.log(workspace);
-	}, [workspace]);
-
 	return (
 		<div className="rounded-xl w-full flex items-center justify-center px-[50px]">
 			<EditorRoot>

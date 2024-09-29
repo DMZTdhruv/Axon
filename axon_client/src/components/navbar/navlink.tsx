@@ -20,7 +20,7 @@ const NavLink = ({ link }: { link: TMenuItem }) => {
 				src={`/assets/${link.icon}`}
 				alt={`icon_${link.title}`}
 			/>
-			<span>{link.title}</span>
+			<span className="text-[14px]">{link.title}</span>
 		</Link>
 	);
 };

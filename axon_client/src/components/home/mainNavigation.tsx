@@ -29,7 +29,7 @@ const MainNavigation = () => {
 		});
 
 	return (
-		<div className="p-[40px] space-y-[20px]">
+		<div className="px-[40px] py-[20px] space-y-[20px]">
 			<h2 className="font-bold text-[18px]">
 				Navigate easily to any page here
 			</h2>

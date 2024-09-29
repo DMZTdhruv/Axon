@@ -14,7 +14,7 @@ const Header = () => {
 		<section>
 			<div className="h-[289px] group transition-all relative w-full ">
 				<div className=" fade-in-0 animate-in relative w-full h-full">
-					<div className="bg-gradient-to-b h-full w-full select-none  from-slate-50/0 absolute z-0 top-0 left-0 to-neutral-950/90 " />
+					<div className="bg-gradient-to-b from-slate-50/0 via-[#0F0F0F]/60 to-[#0F0F0F] to-[83%] h-full w-full select-none absolute z-[5] top-0 left-0" />
 
 					{!authUser.mainCover ? (
 						<div className="h-full relative opacity-0 group-hover:opacity-100 transition-all  w-full">

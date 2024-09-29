@@ -62,7 +62,7 @@ const AxonEditor = ({
 	}, [workspace]);
 
 	return (
-		<div className="rounded-xl w-full flex items-center justify-center py-[20px] px-[50px]">
+		<div className="rounded-xl w-full flex items-center justify-center px-[50px]">
 			<EditorRoot>
 				<EditorContent
 					immediatelyRender={false}

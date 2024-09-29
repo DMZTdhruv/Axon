@@ -20,7 +20,7 @@ const Workspace = ({ workspaceLink }: { workspaceLink: IUserWorkspace }) => {
 			key={workspaceLink._id}
 			className="flex  relative z-[10] flex-col gap-[15px]"
 		>
-			{/* <div className="absolute top-[-5px] left-[-5px] rounded-lg    bg-[#262626] w-full p-2 h-[29px]" /> */}
+			{/* <div className="absolute top-[-5px] left-[-5px] rounded-lg bg-[#262626] w-full p-2 h-[29px]" /> */}
 			<div
 				className={` flex select-none group cursor-pointer items-center justify-between text-[13px] ${isActive ? "opacity-100" : "opacity-60"} hover:opacity-100 transition-all  gap-[10px]`}
 			>

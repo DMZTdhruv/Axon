@@ -1,7 +1,7 @@
 import type { TMenuItem } from "@/types";
 import NavLink from "./navlink";
 import NavbarHeader from "./NavbarHeader";
-import WorkspaceSection from "./WorkspaceSection";
+import WorkspaceSection from "../workspace/WorkspaceSection";
 import Search from "./Search";
 
 const Navbar = () => {

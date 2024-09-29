@@ -6,6 +6,7 @@ import type { IRoutes } from "@/types";
 import WorkspaceTopBar from "./WorkspaceTopBar";
 import WorkspaceCover from "./WorkspaceCover";
 import dynamic from "next/dynamic";
+import { useWorkspaceStore } from "@/stores/workspace";
 // import Editor from "../Editor/axon_editor";
 
 const DynamicAxonEditor = dynamic(() => import("@/components/AxonEditor/axonEditor"), {
@@ -15,7 +16,7 @@ const DynamicAxonEditor = dynamic(() => import("@/components/AxonEditor/axonEdit
 
 const WorkspaceBanner = ({ workspaceId, workspaceType }: { workspaceId: string; workspaceType: string }) => {
   const { findWorkspace, findRoutes } = useWorkspaceUtils();
-
+  const workspaceStore = useWorkspaceStore();
   const currentWorkspace = findWorkspace(workspaceId, workspaceType);
 
   const [folders, setFolders] = useState<IRoutes[]>([]);
@@ -44,9 +45,10 @@ const WorkspaceBanner = ({ workspaceId, workspaceType }: { workspaceId: string; 
     traversePreviousNodes(demoObject, []);
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     setFolders(() => folderRef.current);
-  }, [folderRef, currentWorkspace?.title]);
+  }, [workspaceStore.workspace]);
 
   if (!currentWorkspace) {
     return <p>The workspace doesn&apos;t exists</p>;
@@ -56,7 +58,6 @@ const WorkspaceBanner = ({ workspaceId, workspaceType }: { workspaceId: string; 
     <>
       <WorkspaceTopBar currentWorkspace={currentWorkspace} folders={folders} />
       <WorkspaceCover currentWorkspace={currentWorkspace} />
-
       <DynamicAxonEditor currentWorkspace={currentWorkspace} workspaceId={currentWorkspace._id} />
     </>
   );

@@ -195,7 +195,7 @@ const WorkspaceMoveToSubFolder = ({
 								folderName._id === currentWorkspaceId
 							) {
 								return (
-									<p className="text-[13px] pl-6 py-1 opacity-35">
+									<p className="text-[13px] pl-6 py-1 opacity-35" key={folderName._id}>
 										No pages here
 									</p>
 								);

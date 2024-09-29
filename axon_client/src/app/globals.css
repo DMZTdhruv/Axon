@@ -143,9 +143,6 @@ pre {
 	}
 }
 
-.parent_backdrop--blur {
-	position: relative;
-}
 
 .parent_backdrop--blur::before {
 	content: "";

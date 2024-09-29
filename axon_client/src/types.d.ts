@@ -37,3 +37,12 @@ export type TResponse = {
   success: boolean;
   data: TAuthUser;
 };
+
+export type TNavigationWorkspaceContent = {
+	_id: string;
+	title: string | undefined;
+	cover: string | undefined;
+	icon: string | undefined;
+	workspaceType: string;
+};
+

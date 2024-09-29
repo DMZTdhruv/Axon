@@ -39,6 +39,8 @@ export interface IUserWorkspace {
 	content: JSONContent | undefined;
 }
 
+
+
 interface IUserWorkspaceStore {
 	workspace: {
 		main: IUserWorkspace[];

@@ -14,7 +14,7 @@ export const useUserStore = create<IUserStore>((set) => ({
 	email: "",
 	username: "",
 	userImage: "",
-	userCover: "",
+	userCover: "singapore.jpg",
 	userIcon: "",
 	setUserStore: (userObj) =>
 		set((state) => ({

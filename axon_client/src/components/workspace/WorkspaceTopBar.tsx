@@ -17,7 +17,7 @@ const WorkspaceTopBar = ({
 	const router = useRouter();
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	return (
-		<div className="flex transition-all z-[1000] parent_backdrop--blur top-0 border-b-2 border-[#262626]  sticky gap-[16px] h-[42px] items-center bg-customMain/50">
+		<div className="flex transition-all z-[1000] parent_backdrop--blur top-0 border-b-2 border-[#262626] sticky gap-[16px] h-[42px] items-center bg-customMain/50">
 			<div className="absolute inset-0 " />
 			<div className="flex ml-2 gap-2">
 				<button type="button" className="group">

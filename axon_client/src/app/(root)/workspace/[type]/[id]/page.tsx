@@ -1,9 +1,9 @@
-import WorkspaceBanner from "@/components/workspace/WorkspaceBanner";
+import AxonWorkspace from "@/components/workspace/AxonWorkspace";
 
 const Page = ({ params }: { params: { id: string; type: string } }) => {
 	return (
 		<div className=" bg-customMain text-white w w-full">
-			<WorkspaceBanner workspaceId={params.id} workspaceType={params.type} />
+			<AxonWorkspace workspaceId={params.id} workspaceType={params.type} />
 		</div>
 	);
 };

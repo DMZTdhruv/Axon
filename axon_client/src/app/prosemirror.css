@@ -4,7 +4,7 @@
 }
 
 .ProseMirror {
-	--tw-prose-bold: theme("colors.white") ;
+	--tw-prose-bold: theme("colors.white");
 }
 
 .ProseMirror .is-editor-empty:first-child::before {

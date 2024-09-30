@@ -58,7 +58,7 @@ const Header = () => {
 								className="mb-[8px]  select-none "
 							/>
 						)}
-						<div className="flex flex-col">
+						<div className="flex flex-col ">
 							<span className="text-[13px]  leading-tight">Welcome to </span>
 							<h1 className="text-[30px] leading-tight font-semibold">Home</h1>
 						</div>

@@ -318,10 +318,16 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 					workspaces: IUserWorkspace[],
 					currentWorkspaceId: string,
 				): IUserWorkspace | undefined => {
+					// Check if the workspace is at the top level
+					const topLevelIndex = workspaces.findIndex(
+						(w) => w._id === currentWorkspaceId,
+					);
+					if (topLevelIndex !== -1) {
+						return workspaces.splice(topLevelIndex, 1)[0];
+					}
+
+					// If not at top level, search in subPages
 					for (let i = 0; i < workspaces.length; i++) {
-						if (workspaces[i]._id === currentWorkspaceId) {
-							return workspaces.splice(i, 1)[0];
-						}
 						if (workspaces[i].subPages && workspaces[i].subPages.length > 0) {
 							const subWorkspace = findWorkspaceAndRemove(
 								workspaces[i].subPages,
@@ -352,8 +358,11 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 					return undefined;
 				};
 
+				// Create a new copy of the source workspace array
+				const sourceWorkspaces = [...state.workspace[workspaceType]];
+
 				const workspaceToMove = findWorkspaceAndRemove(
-					[...state.workspace[workspaceType]],
+					sourceWorkspaces,
 					currentWorkspaceId,
 				);
 
@@ -379,24 +388,26 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 
 				const newWorkspaceState = {
 					...state.workspace,
-					[workspaceType]: [...state.workspace[workspaceType]],
+					[workspaceType]: sourceWorkspaces, // Use the modified source array
 					[toWorkspaceType]: state.workspace[toWorkspaceType]
 						? [...state.workspace[toWorkspaceType]]
-						: state.workspace[toWorkspaceType],
+						: [],
 				};
+
 				const newWorkspaceLocation = findToWorkspaceLocation(
 					newWorkspaceState[toWorkspaceType] || [],
 					toWorkspaceId,
 				);
 
 				if (!newWorkspaceLocation) {
-					return state;
+					// If no destination workspace found, add to the top level of the destination type
+					newWorkspaceState[toWorkspaceType]?.push(workspaceToMove);
+				} else {
+					newWorkspaceLocation.subPages = [
+						workspaceToMove,
+						...(newWorkspaceLocation.subPages || []),
+					];
 				}
-
-				newWorkspaceLocation.subPages = [
-					workspaceToMove,
-					...newWorkspaceLocation.subPages,
-				];
 
 				return {
 					...state,

@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import {
 	Card,
 	CardContent,
@@ -16,53 +16,21 @@ import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth";
-import useSign from "@/app/hooks/useSign";
 
 const SignUpCard = () => {
-	const [loading, setLoading] = useState<boolean>(false);
-	const [error, setError] = useState<string>("");
-	const [message, setMessage] = useState<string>("");
 	const router = useRouter();
-
-	const { sendSignUpData } = useSign();
-
 	const [localUsername, setLocalUsername] = useState<string>("");
 	const [email, setEmail] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
 
-	const { setAuthStore, username, _id } = useAuthStore();
-
-	const signUp = async () => {
-		setLoading(() => true);
-		try {
-			const data = await sendSignUpData({ email, username, password });
-			if (!data) throw new Error("No response received from the server");
-			if (data?.message) {
-				setMessage(data.message);
-			}
-			setAuthStore({ _id: data.data._id, username: data.data.username });
-			localStorage.setItem("axon_user", JSON.stringify(data.data));
-			setLoading(() => false);
-			router.push("/");
-		} catch (error) {
-			if (error instanceof Error) {
-				setError(error.message);
-			}
-			setLoading(() => false);
-		}
-	};
+	const { isLoading, error, signUp, message } = useAuthStore();
 
 	const sendData = async (e: FormEvent) => {
 		e.preventDefault();
-		if (
-			email.trim() === "" ||
-			localUsername.trim() === "" ||
-			password.trim() === ""
-		) {
-			return;
+		const authenticated = await signUp(email, localUsername, password);
+		if (authenticated) {
+			router.push("/");
 		}
-
-		await signUp();
 	};
 
 	return (
@@ -83,7 +51,7 @@ const SignUpCard = () => {
 					<Input
 						className=" bg-neutral-900 border-neutral-700 text-[15px] rounded-[8px]  focus-visible:ring-0 focus-visible:ring-transparent"
 						type="email"
-						disabled={loading}
+						disabled={isLoading}
 						value={email}
 						placeholder="Enter your email"
 						required
@@ -92,7 +60,7 @@ const SignUpCard = () => {
 					<Input
 						className="  bg-neutral-900 border-neutral-700 text-[15px] rounded-[8px] focus-visible:ring-0 focus-visible:ring-transparent"
 						type="text"
-						disabled={loading}
+						disabled={isLoading}
 						value={localUsername}
 						placeholder="Enter your username"
 						required
@@ -101,14 +69,14 @@ const SignUpCard = () => {
 					<Input
 						className=" bg-neutral-900 border-neutral-700 text-[15px]  rounded-[8px] focus-visible:ring-0 focus-visible:ring-transparent"
 						type="password"
-						disabled={loading}
+						disabled={isLoading}
 						value={password}
 						placeholder="Enter your password"
 						required
 						onChange={(e) => setPassword(e.target.value)}
 					/>
-					<Button type="submit" variant="axon" disabled={loading}>
-						{loading ? "Submitting" : "Submit"}
+					<Button type="submit" variant="axon" disabled={isLoading}>
+						{isLoading ? "Submitting" : "Submit"}
 					</Button>
 				</form>
 				{error && <p className="text-red-500 text-center">{error}</p>}

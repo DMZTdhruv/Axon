@@ -1,13 +1,16 @@
 "use client";
 
 import { useAuthStore } from "@/stores/auth";
+import { useUserStore } from "@/stores/user";
 import Image from "next/image";
 import { IoDocumentTextOutline } from "react-icons/io5";
+import { Skeleton } from "../ui/skeleton";
 
 const Header = () => {
-	const authUser = useAuthStore();
-	if (!authUser._id) {
-		return <p>Unauthenticated user</p>;
+	const user = useUserStore();
+	const { isAuthenticated } = useAuthStore();
+	if (!isAuthenticated) {
+		return <Skeleton className="w-full h-[289px] bg-neutral-900" />;
 	}
 
 	return (
@@ -16,7 +19,7 @@ const Header = () => {
 				<div className=" fade-in-0 animate-in relative w-full h-full">
 					<div className="bg-gradient-to-b from-slate-50/0 via-[#0F0F0F]/60 to-[#0F0F0F] to-[83%] h-full w-full select-none absolute z-[5] top-0 left-0" />
 
-					{!authUser.mainCover ? (
+					{!user.userCover ? (
 						<div className="h-full relative opacity-0 group-hover:opacity-100 transition-all  w-full">
 							<div className="flex gap-2 absolute top-[24px] right-[24px]">
 								<button
@@ -29,7 +32,7 @@ const Header = () => {
 						</div>
 					) : (
 						<Image
-							src={`/assets/${authUser.mainCover}`}
+							src={`/assets/${user.userCover}`}
 							alt="idk man"
 							height={250}
 							width={250}
@@ -40,10 +43,10 @@ const Header = () => {
 					)}
 
 					<div className="absolute flex gap-2 items-end bottom-[30px] left-[40px] z-[10]">
-						{authUser.mainIcon ? (
+						{user.userIcon ? (
 							<Image
 								alt="workspace_icon"
-								src={`/assets/${authUser.mainIcon}`}
+								src={`/assets/${user.userIcon}`}
 								height={25}
 								width={25}
 								draggable={false}

@@ -5,7 +5,8 @@ interface IUserStore {
 	username: string;
 	email: string;
 	userImage: string;
-	password: string;
+	userIcon: string;
+	userCover: string;
 	setUserStore: (userObj: Omit<TUser, "userImage">) => void;
 }
 
@@ -13,7 +14,8 @@ export const useUserStore = create<IUserStore>((set) => ({
 	email: "",
 	username: "",
 	userImage: "",
-	password: "",
+	userCover: "",
+	userIcon: "",
 	setUserStore: (userObj) =>
 		set((state) => ({
 			...state,

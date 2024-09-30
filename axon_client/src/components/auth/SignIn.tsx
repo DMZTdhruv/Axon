@@ -1,6 +1,6 @@
 "use client";
 
-import React, { type FormEvent, useState } from "react";
+import React, { type FormEvent, useEffect, useState } from "react";
 import {
 	Card,
 	CardContent,
@@ -15,63 +15,23 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { useRouter } from "next/navigation";
-import axios, { AxiosError } from "axios";
-import type { TResponse, TUser } from "@/types";
 import { useAuthStore } from "@/stores/auth";
 
 const SignInCard = () => {
+	const { isLoading, error, message, login, logout } = useAuthStore();
+
+	// User sign in data
 	const [email, setEmail] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
-
-	const [loading, setLoading] = useState<boolean>(false);
-	const [error, setError] = useState<string>("");
-	const [message, setMessage] = useState<string>("");
 	const router = useRouter();
 
-	const { setAuthStore } = useAuthStore();
-
-	const handleSubmitData = async () => {
-		const signInData: Omit<TUser, "userImage" | "username"> = {
-			email,
-			password,
-		};
-		try {
-			setLoading(() => true);
-			const { data } = await axios.post<TResponse>(
-				"http://localhost:3001/api/auth/sign-in",
-				signInData,
-				{
-					withCredentials: true,
-				},
-			);
-			console.log(data);
-
-			setLoading(() => false);
-			setMessage(() => data.message);
-			setAuthStore({ _id: data.data._id, username: data.data.username });
-			localStorage.setItem("axon_user", JSON.stringify(data.data));
-
-			router.push("/home");
-		} catch (error) {
-			if (error instanceof AxiosError) {
-				setError(error.response?.data.message);
-				setTimeout(() => {
-					setError("");
-				}, 5000);
-
-				setLoading(() => false);
-			}
-		}
-	};
-
-	const sendData = async (e: FormEvent) => {
+	// handling submission of data
+	const handleSubmitData = async (e: FormEvent) => {
 		e.preventDefault();
-		if (email.trim() === "" || password.trim() === "") {
-			console.log("Please fill out all fields");
-			return;
+		const authenticated = await login(email, password);
+		if (authenticated) {
+			router.push("/");
 		}
-
-		await handleSubmitData();
 	};
 
 	return (
@@ -88,11 +48,14 @@ const SignInCard = () => {
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<form onSubmit={sendData} className="w-full gap-[15px] flex flex-col">
+				<form
+					onSubmit={handleSubmitData}
+					className="w-full gap-[15px] flex flex-col"
+				>
 					<Input
 						className="bg-neutral-900 text-[15px] border-neutral-700 rounded-[8px] focus-visible:ring-0 focus-visible:ring-transparent"
 						type="email"
-						disabled={loading}
+						disabled={isLoading}
 						placeholder="Enter your email"
 						required
 						onChange={(e) => setEmail(e.target.value)}
@@ -100,13 +63,13 @@ const SignInCard = () => {
 					<Input
 						className="bg-neutral-900 text-[15px] border-neutral-700 rounded-[8px] focus-visible:ring-0 focus-visible:ring-transparent"
 						type="password"
-						disabled={loading}
+						disabled={isLoading}
 						placeholder="Enter your password"
 						required
 						onChange={(e) => setPassword(e.target.value)}
 					/>
 					<Button type="submit" variant="axon" disabled={false}>
-						{loading ? "Signing in.." : "Sign in"}
+						{isLoading ? "Signing in.." : "Sign in"}
 					</Button>
 					{error && <p className="text-red-500 text-center">{error}</p>}
 					{message !== "" && (

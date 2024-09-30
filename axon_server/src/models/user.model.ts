@@ -9,7 +9,7 @@ export interface IUser extends Document {
 	updatedAt: Date;
 	workspaces: {
 		main: Schema.Types.ObjectId[];
-		everything: Schema.Types.ObjectId[];
+		axonverse: Schema.Types.ObjectId[];
 	};
 	preferences: {
 		theme: string;
@@ -28,7 +28,7 @@ const userSchema = new Schema<IUser>(
 					type: Schema.Types.ObjectId,
 				},
 			],
-			everything: [
+			axonverse: [
 				{
 					type: Schema.Types.ObjectId,
 				},

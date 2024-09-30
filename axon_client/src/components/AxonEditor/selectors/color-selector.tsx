@@ -21,7 +21,7 @@ interface ColorSelectorProps {
 const TEXT_COLORS: BubbleColorMenuItem[] = [
 	{
 		name: "Default",
-		color: "#ffffff", // White for default text color in dark theme
+		color: "#ffffff",
 	},
 	{
 		name: "Gray",

@@ -21,6 +21,7 @@
     "@tiptap/extension-highlight": "^2.6.6",
     "@tiptap/extension-text-style": "^2.6.6",
     "@tiptap/extension-underline": "^2.6.6",
+    "@types/uuid": "^10.0.0",
     "@uploadthing/react": "^6.8.0",
     "axios": "^1.7.5",
     "class-variance-authority": "^0.7.0",
@@ -41,6 +42,7 @@
     "tiptap-extension-global-drag-handle": "^0.1.12",
     "uploadthing": "^6.13.3",
     "use-debounce": "^10.0.3",
+    "uuid": "^10.0.0",
     "zustand": "^4.5.5"
   },
   "devDependencies": {

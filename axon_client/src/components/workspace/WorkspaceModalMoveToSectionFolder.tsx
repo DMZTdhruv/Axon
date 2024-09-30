@@ -12,7 +12,7 @@ const WorkspaceModalMoveToSectionFolder = ({
 }: {
 	workspaceLink: IUserWorkspace;
 	currentWorkspaceId: string;
-	currentWorkspaceType: "main" | "everything";
+	currentWorkspaceType: "main" | "axonverse";
 }) => {
 	const [openFolder, setOpenFolder] = useState<boolean>(false);
 	const [openModal, setOpenModal] = useState<boolean>(false);
@@ -112,7 +112,7 @@ const WorkspaceMoveToSubFolder = ({
 }: {
 	workspaceLink: IUserWorkspace;
 	currentWorkspaceId: string;
-	currentWorkspaceType: "main" | "everything";
+	currentWorkspaceType: "main" | "axonverse";
 }) => {
 	const [openFolder, setOpenFolder] = useState<boolean>(false);
 	const [openModal, setOpenModal] = useState<boolean>(false);
@@ -195,7 +195,10 @@ const WorkspaceMoveToSubFolder = ({
 								folderName._id === currentWorkspaceId
 							) {
 								return (
-									<p className="text-[13px] pl-6 py-1 opacity-35" key={folderName._id}>
+									<p
+										className="text-[13px] pl-6 py-1 opacity-35"
+										key={folderName._id}
+									>
 										No pages here
 									</p>
 								);

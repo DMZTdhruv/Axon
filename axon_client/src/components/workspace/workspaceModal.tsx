@@ -15,7 +15,7 @@ import WorkspaceModalMoveToSectionFolder from "./WorkspaceModalMoveToSectionFold
 
 interface WorkspaceModalProps {
 	workspaceId: string;
-	workspaceType: "main" | "everything";
+	workspaceType: "main" | "axonverse";
 	setModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -208,7 +208,7 @@ export default WorkspaceModal;
 type TWorkspaceMoveToModalProps = {
 	setMoveToHover: React.Dispatch<SetStateAction<boolean>>;
 	workspaceId: string;
-	workspaceType: "main" | "everything";
+	workspaceType: "main" | "axonverse";
 };
 
 const WorkspaceMoveToModal = ({
@@ -225,7 +225,7 @@ const WorkspaceMoveToModal = ({
 		>
 			<div className="relative p-[0.40rem] flex flex-col gap-[0.40rem] rounded-xl w-[250px]  border-neutral-800 border bg-neutral-950/50 parent_backdrop--blur">
 				<p className="text-[13px] text-neutral-600 pl-3">main</p>
-				{workspaceStore.workspace.main.map((workspaceLink) => {
+				{workspaceStore.workspace?.main?.map((workspaceLink) => {
 					if (workspaceLink._id !== workspaceId) {
 						return (
 							<WorkspaceModalMoveToSectionFolder
@@ -237,8 +237,8 @@ const WorkspaceMoveToModal = ({
 						);
 					}
 				})}
-				<p className="text-[13px] text-neutral-600 pl-3">everything</p>
-				{workspaceStore.workspace.everything.map((workspaceLink) => {
+				<p className="text-[13px] text-neutral-600 pl-3">axonverse</p>
+				{workspaceStore.workspace?.axonverse?.map((workspaceLink) => {
 					if (workspaceLink._id !== workspaceId) {
 						return (
 							<WorkspaceModalMoveToSectionFolder

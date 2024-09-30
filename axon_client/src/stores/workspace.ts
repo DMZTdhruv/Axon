@@ -2,6 +2,7 @@ import WorkspaceCover from "@/components/workspace/WorkspaceCover";
 import type { TAuthUser, TNavigationWorkspaceContent } from "@/types";
 import type { JSONContent } from "novel";
 import { create } from "zustand";
+import { v4 as uuidv4 } from "uuid";
 
 type TPrivileges = {
 	_id: string;
@@ -31,7 +32,7 @@ export interface IUserWorkspace {
 	icon: string | undefined;
 	cover: string | undefined;
 	coverPos: number;
-	workspace: "main" | "everything";
+	workspace: "main" | "axonverse";
 	members: TAuthUser[] | null;
 	parentPageId: string | null;
 	childPageId: string | null;
@@ -42,9 +43,9 @@ export interface IUserWorkspace {
 
 interface IUserWorkspaceStore {
 	workspace: {
-		main: IUserWorkspace[];
-		everything: IUserWorkspace[];
-		recent: TNavigationWorkspaceContent[] | undefined;
+		main: IUserWorkspace[] | null;
+		axonverse: IUserWorkspace[] | null;
+		recent: TNavigationWorkspaceContent[] | null;
 	};
 	addNewRecentWorkspace: (
 		workspaceId: string,
@@ -53,6 +54,7 @@ interface IUserWorkspaceStore {
 		workspaceIcon: string,
 		workspaceCover: string,
 	) => void;
+	addNewParentWorkspace: (workspaceType: "main" | "axonverse") => void;
 	updateWorkspaceTitleById: (
 		workspaceId: string,
 		title: string,
@@ -75,201 +77,203 @@ interface IUserWorkspaceStore {
 	) => void;
 	addNewSubWorkspaceById: (
 		workspaceId: string,
-		workspaceType: "main" | "everything",
+		workspaceType: "main" | "axonverse",
 	) => void;
 	removeWorkspace: (
 		workspaceId: string,
-		workspaceType: "main" | "everything",
+		workspaceType: "main" | "axonverse",
 	) => void;
 	pushWorkspaceToDifferentWorkspace: (
 		currentWorkspaceId: string,
 		toWorkspaceId: string,
-		workspaceType: "main" | "everything",
-		toWorkspaceType: "main" | "everything",
+		workspaceType: "main" | "axonverse",
+		toWorkspaceType: "main" | "axonverse",
 	) => void;
 }
 
 export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 	workspace: {
-		main: [
-			{
-				_id: "myDashboard1",
-				title: "Dhruv dashboard",
-				icon: "homeIcon.svg",
-				cover: "airport.jpeg",
-				coverPos: 50,
-				workspace: "main",
-				members: null,
-				parentPageId: null,
-				childPageId: "subPage1",
-				privileges: null,
-				content: undefined,
-				subPages: [
-					{
-						_id: "subPage1",
-						title: "Todo list",
-						icon: "pageIcon.svg",
-						cover: "singapore3.jpeg",
-						workspace: "main",
-						coverPos: 50,
-						members: null,
-						parentPageId: "myDashboard1",
-						childPageId: "subSubPage1",
-						privileges: null,
-						content: undefined,
-						subPages: [
-							{
-								_id: "subSubPage1",
-								title: "Startup Ideas",
-								icon: "homeIcon.svg",
-								cover:
-									"birthday house decoration barbie house decoration games birthday house decoration ideas bridal house.jpg",
-								workspace: "main",
-								coverPos: 50,
-								members: null,
-								parentPageId: "subPage1",
-								childPageId: null,
-								privileges: null,
-								content: undefined,
-								subPages: [
-									{
-										_id: "subSubSubPage1",
-										title: "WBBA-Beyblade",
-										icon: "homeIcon.svg",
-										cover: undefined,
-										coverPos: 50,
-										workspace: "main",
-										members: null,
-										parentPageId: "subSubPage1",
-										childPageId: null,
-										privileges: null,
-										content: undefined,
-										subPages: [],
-									},
-								],
-							},
-						],
-					},
-					{
-						_id: "subPage2",
-						title: "Meetings",
-						icon: "usersIcon.svg",
-						cover: "GVTIye_awAAS9lW.jpg",
-						coverPos: 50,
-						workspace: "main",
-						members: null,
-						parentPageId: "myDashboard1",
-						childPageId: null,
-						privileges: null,
-						content: undefined,
-						subPages: [],
-					},
-				],
-			},
-			{
-				_id: "dashboard2",
-				title: "Goals before 2024",
-				icon: "clockIcon.svg",
-				cover: "singapore2.jpg",
-				coverPos: 50,
-				workspace: "main",
-				members: null,
-				parentPageId: null,
-				childPageId: "subPage3",
-				privileges: null,
-				content: undefined,
-				subPages: [
-					{
-						_id: "subPage3",
-						title: "Physique",
-						icon: "fireIcon.svg",
-						cover: undefined,
-						workspace: "main",
-						members: null,
-						parentPageId: "dashboard2",
-						coverPos: 50,
-						childPageId: "subSubPage2",
-						privileges: null,
-						content: undefined,
-						subPages: [
-							{
-								_id: "subSubPage2",
-								title: "Alpha Details",
-								icon: "homeIcon.svg",
-								cover: undefined,
-								workspace: "main",
-								coverPos: 50,
-								members: null,
-								parentPageId: "subPage3",
-								childPageId: null,
-								privileges: null,
-								content: undefined,
-								subPages: [],
-							},
-						],
-					},
-					{
-						_id: "subPage4",
-						title: "Investment",
-						icon: "walletIcon.svg",
-						cover: undefined,
-						workspace: "main",
-						coverPos: 50,
-						members: null,
-						parentPageId: "dashboard2",
-						childPageId: null,
-						privileges: null,
-						content: undefined,
-						subPages: [],
-					},
-				],
-			},
-			{
-				_id: "dashboard3",
-				title: "Study Materials",
-				icon: "bookIcon.svg",
-				cover: "singapore3.jpeg",
-				coverPos: 50,
-				workspace: "main",
-				members: null,
-				parentPageId: null,
-				childPageId: null,
-				privileges: null,
-				content: undefined,
-				subPages: [],
-			},
-			{
-				_id: "dashboard4",
-				title: "Photography",
-				icon: "cameraIcon.svg",
-				cover: undefined,
-				coverPos: 50,
-				workspace: "main",
-				members: null,
-				parentPageId: null,
-				childPageId: null,
-				privileges: null,
-				content: undefined,
-				subPages: [],
-			},
-		],
-		everything: [
-			{
-				_id: "everythingId",
-				title: "Everything dashboard",
-				icon: "homeIcon.svg",
-				cover: "airport.jpeg",
-				coverPos: 50,
-				workspace: "everything",
-				members: null,
-				parentPageId: null,
-				childPageId: "subPage1",
-				privileges: null,
-				content: undefined,
-				subPages: [],
-			},
-		],
-		recent: undefined,
+		// main: [
+		// 	{
+		// 		_id: "myDashboard1",
+		// 		title: "Dhruv dashboard",
+		// 		icon: "homeIcon.svg",
+		// 		cover: "airport.jpeg",
+		// 		coverPos: 50,
+		// 		workspace: "main",
+		// 		members: null,
+		// 		parentPageId: null,
+		// 		childPageId: "subPage1",
+		// 		privileges: null,
+		// 		content: undefined,
+		// 		subPages: [
+		// 			{
+		// 				_id: "subPage1",
+		// 				title: "Todo list",
+		// 				icon: "pageIcon.svg",
+		// 				cover: "singapore3.jpeg",
+		// 				workspace: "main",
+		// 				coverPos: 50,
+		// 				members: null,
+		// 				parentPageId: "myDashboard1",
+		// 				childPageId: "subSubPage1",
+		// 				privileges: null,
+		// 				content: undefined,
+		// 				subPages: [
+		// 					{
+		// 						_id: "subSubPage1",
+		// 						title: "Startup Ideas",
+		// 						icon: "homeIcon.svg",
+		// 						cover:
+		// 							"birthday house decoration barbie house decoration games birthday house decoration ideas bridal house.jpg",
+		// 						workspace: "main",
+		// 						coverPos: 50,
+		// 						members: null,
+		// 						parentPageId: "subPage1",
+		// 						childPageId: null,
+		// 						privileges: null,
+		// 						content: undefined,
+		// 						subPages: [
+		// 							{
+		// 								_id: "subSubSubPage1",
+		// 								title: "WBBA-Beyblade",
+		// 								icon: "homeIcon.svg",
+		// 								cover: undefined,
+		// 								coverPos: 50,
+		// 								workspace: "main",
+		// 								members: null,
+		// 								parentPageId: "subSubPage1",
+		// 								childPageId: null,
+		// 								privileges: null,
+		// 								content: undefined,
+		// 								subPages: [],
+		// 							},
+		// 						],
+		// 					},
+		// 				],
+		// 			},
+		// 			{
+		// 				_id: "subPage2",
+		// 				title: "Meetings",
+		// 				icon: "usersIcon.svg",
+		// 				cover: "GVTIye_awAAS9lW.jpg",
+		// 				coverPos: 50,
+		// 				workspace: "main",
+		// 				members: null,
+		// 				parentPageId: "myDashboard1",
+		// 				childPageId: null,
+		// 				privileges: null,
+		// 				content: undefined,
+		// 				subPages: [],
+		// 			},
+		// 		],
+		// 	},
+		// 	{
+		// 		_id: "dashboard2",
+		// 		title: "Goals before 2024",
+		// 		icon: "clockIcon.svg",
+		// 		cover: "singapore2.jpg",
+		// 		coverPos: 50,
+		// 		workspace: "main",
+		// 		members: null,
+		// 		parentPageId: null,
+		// 		childPageId: "subPage3",
+		// 		privileges: null,
+		// 		content: undefined,
+		// 		subPages: [
+		// 			{
+		// 				_id: "subPage3",
+		// 				title: "Physique",
+		// 				icon: "fireIcon.svg",
+		// 				cover: undefined,
+		// 				workspace: "main",
+		// 				members: null,
+		// 				parentPageId: "dashboard2",
+		// 				coverPos: 50,
+		// 				childPageId: "subSubPage2",
+		// 				privileges: null,
+		// 				content: undefined,
+		// 				subPages: [
+		// 					{
+		// 						_id: "subSubPage2",
+		// 						title: "Alpha Details",
+		// 						icon: "homeIcon.svg",
+		// 						cover: undefined,
+		// 						workspace: "main",
+		// 						coverPos: 50,
+		// 						members: null,
+		// 						parentPageId: "subPage3",
+		// 						childPageId: null,
+		// 						privileges: null,
+		// 						content: undefined,
+		// 						subPages: [],
+		// 					},
+		// 				],
+		// 			},
+		// 			{
+		// 				_id: "subPage4",
+		// 				title: "Investment",
+		// 				icon: "walletIcon.svg",
+		// 				cover: undefined,
+		// 				workspace: "main",
+		// 				coverPos: 50,
+		// 				members: null,
+		// 				parentPageId: "dashboard2",
+		// 				childPageId: null,
+		// 				privileges: null,
+		// 				content: undefined,
+		// 				subPages: [],
+		// 			},
+		// 		],
+		// 	},
+		// 	{
+		// 		_id: "dashboard3",
+		// 		title: "Study Materials",
+		// 		icon: "bookIcon.svg",
+		// 		cover: "singapore3.jpeg",
+		// 		coverPos: 50,
+		// 		workspace: "main",
+		// 		members: null,
+		// 		parentPageId: null,
+		// 		childPageId: null,
+		// 		privileges: null,
+		// 		content: undefined,
+		// 		subPages: [],
+		// 	},
+		// 	{
+		// 		_id: "dashboard4",
+		// 		title: "Photography",
+		// 		icon: "cameraIcon.svg",
+		// 		cover: undefined,
+		// 		coverPos: 50,
+		// 		workspace: "main",
+		// 		members: null,
+		// 		parentPageId: null,
+		// 		childPageId: null,
+		// 		privileges: null,
+		// 		content: undefined,
+		// 		subPages: [],
+		// 	},
+		// ],
+		// axonverse: [
+		// 	{
+		// 		_id: "axonverseId",
+		// 		title: "axonverse dashboard",
+		// 		icon: "homeIcon.svg",
+		// 		cover: "airport.jpeg",
+		// 		coverPos: 50,
+		// 		workspace: "axonverse",
+		// 		members: null,
+		// 		parentPageId: null,
+		// 		childPageId: "subPage1",
+		// 		privileges: null,
+		// 		content: undefined,
+		// 		subPages: [],
+		// 	},
+		// ],
+		main: null,
+		axonverse: null,
+		recent: null,
 	},
 
 	updateWorkspaceTitleById: (
@@ -281,22 +285,22 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 			set((state) => ({
 				workspace: {
 					...state.workspace,
-					main: updateWorkspaceTitleById(
-						state.workspace.main,
-						workspaceId,
-						title,
-					),
+					main: state.workspace.main
+						? updateWorkspaceTitleById(state.workspace.main, workspaceId, title)
+						: state.workspace.main,
 				},
 			}));
 		} else {
 			set((state) => ({
 				workspace: {
 					...state.workspace,
-					everything: updateWorkspaceTitleById(
-						state.workspace.everything,
-						workspaceId,
-						title,
-					),
+					axonverse: state.workspace.axonverse
+						? updateWorkspaceTitleById(
+								state.workspace.axonverse,
+								workspaceId,
+								title,
+							)
+						: state.workspace.axonverse,
 				},
 			}));
 		}
@@ -305,83 +309,101 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 	pushWorkspaceToDifferentWorkspace: (
 		currentWorkspaceId: string,
 		toWorkspaceId: string,
-		workspaceType: "main" | "everything",
-		toWorkspaceType: "main" | "everything",
+		workspaceType: "main" | "axonverse",
+		toWorkspaceType: "main" | "axonverse",
 	) => {
 		set((state) => {
-			const findWorkspaceAndRemove = (
-				workspaces: IUserWorkspace[],
-				currentWorkspaceId: string,
-			): IUserWorkspace | undefined => {
-				for (let i = 0; i < workspaces.length; i++) {
-					if (workspaces[i]._id === currentWorkspaceId) {
-						return workspaces.splice(i, 1)[0];
+			if (state.workspace[workspaceType]) {
+				const findWorkspaceAndRemove = (
+					workspaces: IUserWorkspace[],
+					currentWorkspaceId: string,
+				): IUserWorkspace | undefined => {
+					for (let i = 0; i < workspaces.length; i++) {
+						if (workspaces[i]._id === currentWorkspaceId) {
+							return workspaces.splice(i, 1)[0];
+						}
+						if (workspaces[i].subPages && workspaces[i].subPages.length > 0) {
+							const subWorkspace = findWorkspaceAndRemove(
+								workspaces[i].subPages,
+								currentWorkspaceId,
+							);
+							if (subWorkspace) return subWorkspace;
+						}
 					}
-					if (workspaces[i].subPages && workspaces[i].subPages.length > 0) {
-						const subWorkspace = findWorkspaceAndRemove(
-							workspaces[i].subPages,
-							currentWorkspaceId,
-						);
-						if (subWorkspace) return subWorkspace;
+					return undefined;
+				};
+
+				const findToWorkspaceLocation = (
+					workspaces: IUserWorkspace[],
+					toWorkspaceId: string,
+				): IUserWorkspace | undefined => {
+					for (let i = 0; i < workspaces.length; i++) {
+						if (workspaces[i]._id === toWorkspaceId) {
+							return workspaces[i];
+						}
+						if (workspaces[i].subPages && workspaces[i].subPages.length > 0) {
+							const subWorkspace = findToWorkspaceLocation(
+								workspaces[i].subPages,
+								toWorkspaceId,
+							);
+							if (subWorkspace) return subWorkspace;
+						}
 					}
+					return undefined;
+				};
+
+				const workspaceToMove = findWorkspaceAndRemove(
+					[...state.workspace[workspaceType]],
+					currentWorkspaceId,
+				);
+
+				if (!workspaceToMove) {
+					return state;
 				}
-				return undefined;
-			};
 
-			const findToWorkspaceLocation = (
-				workspaces: IUserWorkspace[],
-				toWorkspaceId: string,
-			): IUserWorkspace | undefined => {
-				for (let i = 0; i < workspaces.length; i++) {
-					if (workspaces[i]._id === toWorkspaceId) {
-						return workspaces[i];
-					}
-					if (workspaces[i].subPages && workspaces[i].subPages.length > 0) {
-						const subWorkspace = findToWorkspaceLocation(
-							workspaces[i].subPages,
-							toWorkspaceId,
+				workspaceToMove.workspace = toWorkspaceType;
+				const updateWorkspaceType = (
+					workspace: IUserWorkspace,
+					newType: "main" | "axonverse",
+				) => {
+					workspace.workspace = newType;
+					if (workspace.subPages && workspace.subPages.length > 0) {
+						// biome-ignore lint/complexity/noForEach: <explanation>
+						workspace.subPages.forEach((subPage) =>
+							updateWorkspaceType(subPage, newType),
 						);
-						if (subWorkspace) return subWorkspace;
 					}
+				};
+
+				updateWorkspaceType(workspaceToMove, toWorkspaceType);
+
+				const newWorkspaceState = {
+					...state.workspace,
+					[workspaceType]: [...state.workspace[workspaceType]],
+					[toWorkspaceType]: state.workspace[toWorkspaceType]
+						? [...state.workspace[toWorkspaceType]]
+						: state.workspace[toWorkspaceType],
+				};
+				const newWorkspaceLocation = findToWorkspaceLocation(
+					newWorkspaceState[toWorkspaceType] || [],
+					toWorkspaceId,
+				);
+
+				if (!newWorkspaceLocation) {
+					return state;
 				}
-				return undefined;
-			};
 
-			const workspaceToMove = findWorkspaceAndRemove(
-				[...state.workspace[workspaceType]],
-				currentWorkspaceId,
-			);
+				newWorkspaceLocation.subPages = [
+					workspaceToMove,
+					...newWorkspaceLocation.subPages,
+				];
 
-			if (!workspaceToMove) {
-				return state;
+				return {
+					...state,
+					workspace: newWorkspaceState,
+				};
 			}
-
-			workspaceToMove.workspace = toWorkspaceType;
-
-			const newWorkspaceState = {
-				...state.workspace,
-				[workspaceType]: [...state.workspace[workspaceType]],
-				[toWorkspaceType]: [...state.workspace[toWorkspaceType]],
-			};
-
-			const newWorkspaceLocation = findToWorkspaceLocation(
-				newWorkspaceState[toWorkspaceType],
-				toWorkspaceId,
-			);
-
-			if (!newWorkspaceLocation) {
-				return state;
-			}
-
-			newWorkspaceLocation.subPages = [
-				workspaceToMove,
-				...newWorkspaceLocation.subPages,
-			];
-
-			return {
-				...state,
-				workspace: newWorkspaceState,
-			};
+			return { ...state };
 		});
 	},
 
@@ -412,30 +434,71 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 		}));
 	},
 
-	addNewSubWorkspaceById: (
-		workspaceId: string,
-		workspaceType: "main" | "everything",
-	) => {
+	addNewParentWorkspace: (workspaceType: "main" | "axonverse") => {
+		const newWorkspace: IUserWorkspace = {
+			_id: uuidv4(),
+			title: "Untitled",
+			icon: "axon_logo.svg",
+			cover: "",
+			workspace: workspaceType,
+			coverPos: 50,
+			members: null,
+			parentPageId: null,
+			childPageId: null,
+			privileges: null,
+			content: undefined,
+			subPages: [],
+		};
+
 		if (workspaceType === "main") {
 			set((state) => ({
 				workspace: {
 					...state.workspace,
-					main: addNewSubWorkspaceToParent(
-						state.workspace.main,
-						workspaceId,
-						workspaceType,
-					),
+					main: state.workspace.main
+						? [newWorkspace, ...state.workspace.main]
+						: [newWorkspace],
 				},
 			}));
 		} else {
 			set((state) => ({
 				workspace: {
 					...state.workspace,
-					everything: addNewSubWorkspaceToParent(
-						state.workspace.everything,
-						workspaceId,
-						workspaceType,
-					),
+					axonverse: state.workspace.axonverse
+						? [newWorkspace, ...state.workspace.axonverse]
+						: [newWorkspace],
+				},
+			}));
+		}
+	},
+
+	addNewSubWorkspaceById: (
+		workspaceId: string,
+		workspaceType: "main" | "axonverse",
+	) => {
+		if (workspaceType === "main") {
+			set((state) => ({
+				workspace: {
+					...state.workspace,
+					main: state.workspace.main
+						? addNewSubWorkspaceToParent(
+								state.workspace.main,
+								workspaceId,
+								workspaceType,
+							)
+						: state.workspace.main,
+				},
+			}));
+		} else {
+			set((state) => ({
+				workspace: {
+					...state.workspace,
+					axonverse: state.workspace.axonverse
+						? addNewSubWorkspaceToParent(
+								state.workspace.axonverse,
+								workspaceId,
+								workspaceType,
+							)
+						: state.workspace.axonverse,
 				},
 			}));
 		}
@@ -443,23 +506,24 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 
 	removeWorkspace: (
 		workspaceId: string,
-		workspaceType: "main" | "everything",
+		workspaceType: "main" | "axonverse",
 	) => {
 		if (workspaceType === "main") {
 			set((state) => ({
 				workspace: {
 					...state.workspace,
-					main: removeWorkspaceById(state.workspace.main, workspaceId),
+					main: state.workspace.main
+						? removeWorkspaceById(state.workspace.main, workspaceId)
+						: state.workspace.main,
 				},
 			}));
 		} else {
 			set((state) => ({
 				workspace: {
 					...state.workspace,
-					everything: removeWorkspaceById(
-						state.workspace.everything,
-						workspaceId,
-					),
+					axonverse: state.workspace.axonverse
+						? removeWorkspaceById(state.workspace.axonverse, workspaceId)
+						: state.workspace.axonverse,
 				},
 			}));
 		}
@@ -474,22 +538,26 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 			set((state) => ({
 				workspace: {
 					...state.workspace,
-					main: updateWorkspaceContentById(
-						state.workspace.main,
-						workspaceId,
-						content,
-					),
+					main: state.workspace.main
+						? updateWorkspaceContentById(
+								state.workspace.main,
+								workspaceId,
+								content,
+							)
+						: state.workspace.main,
 				},
 			}));
 		} else {
 			set((state) => ({
 				workspace: {
 					...state.workspace,
-					everything: updateWorkspaceContentById(
-						state.workspace.everything,
-						workspaceId,
-						content,
-					),
+					axonverse: state.workspace.axonverse
+						? updateWorkspaceContentById(
+								state.workspace.axonverse,
+								workspaceId,
+								content,
+							)
+						: state.workspace.axonverse,
 				},
 			}));
 		}
@@ -505,22 +573,26 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 			set((state) => ({
 				workspace: {
 					...state.workspace,
-					main: updateWorkspaceCoverById(
-						state.workspace.main,
-						workspaceId,
-						workspaceCover,
-					),
+					main: state.workspace.main
+						? updateWorkspaceCoverById(
+								state.workspace.main,
+								workspaceId,
+								workspaceCover,
+							)
+						: state.workspace.main,
 				},
 			}));
 		} else {
 			set((state) => ({
 				workspace: {
 					...state.workspace,
-					everything: updateWorkspaceCoverById(
-						state.workspace.everything,
-						workspaceId,
-						workspaceCover,
-					),
+					axonverse: state.workspace.axonverse
+						? updateWorkspaceCoverById(
+								state.workspace.axonverse,
+								workspaceId,
+								workspaceCover,
+							)
+						: state.workspace.axonverse,
 				},
 			}));
 		}
@@ -535,22 +607,26 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 			set((state) => ({
 				workspace: {
 					...state.workspace,
-					main: updateWorkspaceYPositionById(
-						state.workspace.main,
-						workspaceId,
-						yPosition,
-					),
+					main: state.workspace.main
+						? updateWorkspaceYPositionById(
+								state.workspace.main,
+								workspaceId,
+								yPosition,
+							)
+						: state.workspace.main,
 				},
 			}));
 		} else {
 			set((state) => ({
 				workspace: {
 					...state.workspace,
-					everything: updateWorkspaceYPositionById(
-						state.workspace.everything,
-						workspaceId,
-						yPosition,
-					),
+					axonverse: state.workspace.axonverse
+						? updateWorkspaceYPositionById(
+								state.workspace.axonverse,
+								workspaceId,
+								yPosition,
+							)
+						: state.workspace.axonverse,
 				},
 			}));
 		}
@@ -696,7 +772,7 @@ const removeWorkspaceById = (
 const addNewSubWorkspaceToParent = (
 	workspaces: IUserWorkspace[],
 	workspaceId: string,
-	workspaceType: "main" | "everything",
+	workspaceType: "main" | "axonverse",
 ): IUserWorkspace[] => {
 	const newWorkspace: IUserWorkspace = {
 		_id: Math.random().toString(36).substring(2, 9),

@@ -7,8 +7,8 @@ import Link from "next/link";
 
 const MainNavigation = () => {
 	const workspaceStore = useWorkspaceStore();
-	const mainWorkspaceList: TNavigationWorkspaceContent[] =
-		workspaceStore.workspace.main.map((workspace) => {
+	const mainWorkspaceList: TNavigationWorkspaceContent[] | undefined =
+		workspaceStore.workspace?.main?.map((workspace) => {
 			return {
 				_id: workspace._id,
 				title: workspace.title,
@@ -17,8 +17,8 @@ const MainNavigation = () => {
 				workspaceType: workspace.workspace,
 			};
 		});
-	const everythingWorkspaceList: TNavigationWorkspaceContent[] =
-		workspaceStore.workspace.everything.map((workspace) => {
+	const axonverseWorkspaceList: TNavigationWorkspaceContent[] | undefined =
+		workspaceStore.workspace?.axonverse?.map((workspace) => {
 			return {
 				_id: workspace._id,
 				title: workspace.title,
@@ -37,7 +37,7 @@ const MainNavigation = () => {
 				<div className="flex flex-col gap-[10px]">
 					<p className="text-[#595959] text-[13px]">Main</p>
 					<div className="flex gap-[10px] -translate-x-[5px]">
-						{mainWorkspaceList.map((mainNavItems) => (
+						{mainWorkspaceList?.map((mainNavItems) => (
 							<NavItems
 								workspaceType={mainNavItems.workspaceType}
 								key={mainNavItems._id}
@@ -50,9 +50,9 @@ const MainNavigation = () => {
 					</div>
 				</div>
 				<div className="flex flex-col gap-[10px]">
-					<p className="text-[#595959] text-[13px]">Everything</p>
+					<p className="text-[#595959] text-[13px]">Axonverse</p>
 					<div className="flex gap-[10px] -translate-x-[5px]">
-						{everythingWorkspaceList.map((mainNavItems) => (
+						{axonverseWorkspaceList?.map((mainNavItems) => (
 							<NavItems
 								workspaceType={mainNavItems.workspaceType}
 								key={mainNavItems._id}

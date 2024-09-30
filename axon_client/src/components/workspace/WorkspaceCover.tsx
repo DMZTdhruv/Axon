@@ -63,7 +63,7 @@ const WorkspaceCover = ({
 				{/* remove the asset when uploading images to cloud */}
 				{currentWorkspace.cover && (
 					<Image
-						src={`/assets/${currentWorkspace?.cover}`}
+						src={`${currentWorkspace?.cover}`}
 						alt={`${currentWorkspace.title}`}
 						height={250}
 						width={250}
@@ -116,7 +116,7 @@ const WorkspaceCover = ({
 							className="mb-[8px]  select-none "
 						/>
 					) : (
-						<HiOutlineDocument size={25} />
+						<HiOutlineDocument />
 					)}
 					<div className="flex flex-col">
 						<span className="text-[13px]  leading-tight opacity-65">

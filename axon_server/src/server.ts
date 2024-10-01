@@ -1,19 +1,19 @@
 import express from "express";
-import authRoutes from "./routers/auth/login.js";
 import { connectToDb } from "./db/db.js";
-import type { Request, Response } from "express";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
+import authRouter from "./routers/auth/route.js";
+import workspaceRouter from "./routers/workspace/route.js";
 
 // connecting to database
-
 const main = async () => {
 	await connectToDb();
 	const app = express();
 	const port: number = 3001;
+	
 	app.use(
 		cors({
 			origin: ["http://localhost:3000"],
@@ -34,11 +34,8 @@ const main = async () => {
 	});
 
 	app.use(limiter);
-
-	app.use("/api/auth", authRoutes);
-	app.get("/", (_req: Request, res: Response) => {
-		res.status(200).json({ message: "Welcome to axon api" });
-	});
+	app.use("/api/auth", authRouter);
+	app.use("/api/workspace", workspaceRouter);
 
 	app.listen(port, () => {
 		console.log("Server is running on port http://localhost:3001");

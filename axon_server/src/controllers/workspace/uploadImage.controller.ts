@@ -15,7 +15,7 @@ export const uploadImageController = async (req: Request, res: Response) => {
 		const user = req.user;
 		const validate = validateUploadImage(user, workspaceId, file);
 		if (validate.error) {
-			return res.status(400).json(validate.errorMessage);
+			return res.status(400).json({ error: validate.errorMessage });
 		}
 
 		const { statusCode, response } = await uploadImageService(

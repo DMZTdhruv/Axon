@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useEffect, useState, type ChangeEvent } from "react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import useUploadCover from "@/hooks/workspace/useUploadCover";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 const WorkspaceCover = ({
 	currentWorkspace,
@@ -12,14 +14,7 @@ const WorkspaceCover = ({
 		? currentWorkspace.title
 		: "Untitled";
 	const [yPos, setYPos] = useState<number>(currentWorkspace.coverPos);
-	const {
-		mutate: uploadCover,
-		isPending,
-		isError,
-		error,
-		isSuccess,
-		data,
-	} = useUploadCover();
+	const { mutate: uploadCover, isPending } = useUploadCover();
 
 	const workspace = useWorkspaceStore();
 
@@ -39,6 +34,21 @@ const WorkspaceCover = ({
 							currentWorkspace.workspace,
 							data.data.url,
 						);
+					},
+					onError: (error) => {
+						if (error.response?.data) {
+							toast.error(error.response.data.message, {
+								className: "bg-neutral-900 border border-neutral-800",
+								action: {
+									label: "Close",
+									onClick: () => console.log("closed error notification"),
+								},
+							});
+						} else {
+							toast.error("An unexpected error occurred", {
+								className: "bg-neutral-900 border border-neutral-800",
+							});
+						}
 					},
 				},
 			);

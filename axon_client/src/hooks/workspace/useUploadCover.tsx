@@ -1,6 +1,6 @@
 import { API_URL } from "@/utils/constants";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { type AxiosError } from "axios";
 
 interface UploadCoverResponse {
 	statusCode: number;
@@ -11,6 +11,12 @@ interface UploadCoverResponse {
 	};
 }
 
+// extension for the Axios error 
+type AxonErrorResponse = {
+	message: string;
+};
+
+type AxonError = AxiosError<AxonErrorResponse>;
 interface UploadCoverRequest {
 	workspaceId: string;
 	file: File;
@@ -40,7 +46,7 @@ const uploadCover = async (
 };
 
 const useUploadCover = () => {
-	return useMutation<UploadCoverResponse, Error, UploadCoverRequest>({
+	return useMutation<UploadCoverResponse, AxonError, UploadCoverRequest>({
 		mutationFn: uploadCover,
 	});
 };

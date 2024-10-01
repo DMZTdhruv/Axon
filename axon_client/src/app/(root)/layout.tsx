@@ -44,7 +44,7 @@ export default function RootLayout({
 					<Navbar />
 					{children}
 				</ReactQueryProvider>
-				<Toaster className="border-neutral-500 bg-neutral-950/50 backdrop-blur-xl" />
+				<Toaster className="border-neutral-500 bg-customPrimary backdrop-blur-xl" />
 			</body>
 		</html>
 	);

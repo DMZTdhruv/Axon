@@ -1,76 +1,55 @@
+import type { TValidateResponse } from "../types.js";
 import type { TUser } from "../types/types.js";
+import { errorMessage } from "./errorResponse.js";
 
 const validateEmail = (email: string): boolean => {
 	const emailRegex = /[a-zA-Z]+([-+.'][a-zA-Z]+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
 	return emailRegex.test(email);
 };
 
-type TValidateResponse = {
-	error: boolean;
-	errorMessage: string;
-};
-
 export const validateSingUpDetails = (userData: TUser): TValidateResponse => {
 	if (Object.keys(userData).length === 0) {
-		return {
-			error: true,
-			errorMessage: "Incomplete details for sign up, missing username email and password",
-		};
+		return errorMessage(
+			true,
+			"Incomplete details for sign up, missing username email and password",
+		);
 	}
 	if (!userData.username || !userData.email || !userData.password) {
-		return {
-			error: true,
-			errorMessage: "incomplete details provided",
-		};
+		return errorMessage(true, "incomplete details provided");
 	}
-	if (userData.username.trim() === "" || userData.email.trim() === "" || userData.password === "") {
-		return {
-			error: true,
-			errorMessage: "incomplete details provided",
-		};
+	if (
+		userData.username.trim() === "" ||
+		userData.email.trim() === "" ||
+		userData.password === ""
+	) {
+		return errorMessage(true, "incomplete details provided");
 	}
 
 	if (!validateEmail(userData.email)) {
-		return {
-			error: true,
-			errorMessage: "invalid email provided",
-		};
+		return errorMessage(true, "invalid email provided");
 	}
 
-	return {
-		error: false,
-		errorMessage: "",
-	};
+	return errorMessage(false, "");
 };
 
 export const validateUserLogin = (userData: TUser) => {
 	if (Object.keys(userData).length === 0) {
-		return {
-			error: true,
-			errorMessage: "Incomplete details for sign up, missing username email and password",
-		};
+		return errorMessage(
+			true,
+			"Incomplete details for sign up, missing username email and password",
+		);
 	}
 
 	if (!userData.email || !userData.password) {
-		return {
-			error: true,
-			errorMessage: "incomplete details provided",
-		};
+		return errorMessage(true, "incomplete details provided");
 	}
 
 	if (!validateEmail(userData.email)) {
-		return {
-			error: true,
-			errorMessage: "invalid email provided",
-		};
+		return errorMessage(true, "invalid email provided");
 	}
 
-	return {
-		error: false,
-		errorMessage: "",
-	};
+	return errorMessage(false, "");
 };
-
 
 // import Joi from 'joi';
 

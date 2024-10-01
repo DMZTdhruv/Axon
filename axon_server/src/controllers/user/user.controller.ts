@@ -1,11 +1,10 @@
 import {
 	userSignInService,
 	userSignUpService,
-} from "../service/user.service.js";
-import type { TUser } from "../types/types.js";
+} from "../../service/user.service.js";
+import type { TUser } from "../../types/types.js";
 import type { Request, Response } from "express";
-import type { TResponse } from "../utils/axonResponse.js";
-
+import type { TResponse } from "../../utils/axonResponse.js";
 const AXON_USER: string = "axon_user";
 
 export const userSingUpController = async (req: Request, res: Response) => {

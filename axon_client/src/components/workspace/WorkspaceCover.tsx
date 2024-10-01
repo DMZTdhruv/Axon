@@ -1,8 +1,9 @@
 import { HiOutlineDocument } from "react-icons/hi";
 import { useWorkspaceStore, type IUserWorkspace } from "@/stores/workspace";
 import Image from "next/image";
-import { useState, type ChangeEvent } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import useUploadCover from "@/hooks/workspace/useUploadCover";
 
 const WorkspaceCover = ({
 	currentWorkspace,
@@ -11,17 +12,35 @@ const WorkspaceCover = ({
 		? currentWorkspace.title
 		: "Untitled";
 	const [yPos, setYPos] = useState<number>(currentWorkspace.coverPos);
+	const {
+		mutate: uploadCover,
+		isPending,
+		isError,
+		error,
+		isSuccess,
+		data,
+	} = useUploadCover();
 
 	const workspace = useWorkspaceStore();
 
 	const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0];
 		if (file) {
-			const imageUrl = URL.createObjectURL(file);
-			workspace.updateWorkspaceCover(
-				currentWorkspace._id,
-				currentWorkspace.workspace,
-				imageUrl,
+			uploadCover(
+				{
+					workspaceId: currentWorkspace._id,
+					file: file,
+				},
+				{
+					onSuccess: (data) => {
+						console.log(data);
+						workspace.updateWorkspaceCover(
+							currentWorkspace._id,
+							currentWorkspace.workspace,
+							data.data.url,
+						);
+					},
+				},
 			);
 		}
 	};
@@ -53,8 +72,15 @@ const WorkspaceCover = ({
 									accept="image/*"
 									onChange={handleImageChange}
 									className=" hidden w-0 h-0"
+									disabled={isPending}
 								/>
-								{currentWorkspace.cover ? "Change cover" : "Upload an image"}
+								{currentWorkspace.cover ? (
+									<span>Change cover</span>
+								) : isPending ? (
+									<span className="animate-pulse">Uploading...</span>
+								) : (
+									<span>Upload and image</span>
+								)}
 							</label>
 						</div>
 					</div>

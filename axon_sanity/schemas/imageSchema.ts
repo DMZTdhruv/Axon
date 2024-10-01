@@ -13,5 +13,10 @@ export default {
 			title: "Workspace Id",
 			type: "string",
 		},
+		{
+			name: "uploadedBy",
+			title: "uploaded by",
+			type: "string",
+		},
 	],
 };

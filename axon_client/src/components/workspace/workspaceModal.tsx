@@ -1,6 +1,6 @@
 "use client";
 
-import useWorkspaceUtils from "@/app/hooks/useWorkspaceUtils";
+import useWorkspaceUtils from "@/hooks/useWorkspaceUtils";
 import { useWorkspaceStore } from "@/stores/workspace";
 import type React from "react";
 import { type SetStateAction, useState } from "react";

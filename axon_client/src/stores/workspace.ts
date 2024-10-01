@@ -579,7 +579,7 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 		workspaceType: string,
 		workspaceCover: string,
 	) => {
-		console.log("hello world", workspaceCover);
+		console.log(workspaceCover);
 		if (workspaceType === "main") {
 			set((state) => ({
 				workspace: {

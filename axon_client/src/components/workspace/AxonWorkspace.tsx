@@ -1,6 +1,6 @@
 "use client";
 
-import useWorkspaceUtils from "@/app/hooks/useWorkspaceUtils";
+import useWorkspaceUtils from "@/hooks/useWorkspaceUtils";
 import { useEffect, useRef, useState } from "react";
 import type { IRoutes } from "@/types";
 import WorkspaceTopBar from "./WorkspaceTopBar";

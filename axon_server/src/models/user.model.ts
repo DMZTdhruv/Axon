@@ -1,20 +1,5 @@
-import mongoose, { type Document, Schema } from "mongoose";
-
-export interface IUser extends Document {
-	username: string;
-	email: string;
-	userImage: string;
-	password: string;
-	createdAt: Date;
-	updatedAt: Date;
-	workspaces: {
-		main: Schema.Types.ObjectId[];
-		axonverse: Schema.Types.ObjectId[];
-	};
-	preferences: {
-		theme: string;
-	};
-}
+import mongoose, { Schema } from "mongoose";
+import type { IUser } from "../types";
 
 const userSchema = new Schema<IUser>(
 	{
@@ -25,12 +10,12 @@ const userSchema = new Schema<IUser>(
 		workspaces: {
 			main: [
 				{
-					type: Schema.Types.ObjectId,
+					type: String,
 				},
 			],
 			axonverse: [
 				{
-					type: Schema.Types.ObjectId,
+					type: String,
 				},
 			],
 		},

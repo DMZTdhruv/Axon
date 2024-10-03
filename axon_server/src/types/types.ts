@@ -5,3 +5,15 @@ export type TUser = {
 	password: string;
 	userImage: string,
 };
+
+export type TCreateWorkspaceControllerRequest = {
+   _id: string,
+   workspace: 'main' | 'axonverse',
+   createdBy: string,
+}
+
+export type TCreateWorkspaceService = {
+   _id: string,
+   workspace: 'main' | 'axonverse',
+   createdBy: string,
+}

@@ -4,7 +4,10 @@ import type { TAxonResponse, TResponse } from "../utils/axonResponse.js";
 import axonResponse from "../utils/axonResponse.js";
 import { checkHashPassword } from "../utils/hash.utils.js";
 import { generateJsonWebToken } from "../utils/jwt.utils.js";
-import { validateSingUpDetails, validateUserLogin } from "../validators/user.validator.js";
+import {
+	validateSingUpDetails,
+	validateUserLogin,
+} from "../validators/user.validator.js";
 
 const userRepo = new UserRepository();
 
@@ -13,7 +16,9 @@ interface IUserServiceReturn {
 	axonResponse: TAxonResponse;
 }
 
-export const userSignUpService = async (userData: TUser): Promise<IUserServiceReturn> => {
+export const userSignUpService = async (
+	userData: TUser,
+): Promise<IUserServiceReturn> => {
 	try {
 		// validate user data
 		const validation = validateSingUpDetails(userData);
@@ -58,9 +63,11 @@ export const userSignUpService = async (userData: TUser): Promise<IUserServiceRe
 			axonResponse: axonResponse(201, response),
 		};
 	} catch (error) {
-		if (error instanceof Error) console.log("Error occurred in sign up service", error.message);
+		if (error instanceof Error)
+			console.log("Error occurred in sign up service", error.message);
 		const response: TResponse = {
-			message: error instanceof Error ? error.message : "An unknown error occurred",
+			message:
+				error instanceof Error ? error.message : "An unknown error occurred",
 			success: false,
 			data: null,
 		};
@@ -72,7 +79,9 @@ export const userSignUpService = async (userData: TUser): Promise<IUserServiceRe
 };
 
 //logging in service
-export const userSignInService = async (userData: TUser): Promise<IUserServiceReturn> => {
+export const userSignInService = async (
+	userData: TUser,
+): Promise<IUserServiceReturn> => {
 	try {
 		//validating user data
 		const validation = validateUserLogin(userData);
@@ -102,9 +111,8 @@ export const userSignInService = async (userData: TUser): Promise<IUserServiceRe
 			};
 		}
 
-
-		// checking the password 
-		if (!await checkHashPassword(userData.password, userExist.password)) {
+		// checking the password
+		if (!(await checkHashPassword(userData.password, userExist.password))) {
 			const response: TResponse = {
 				message: "invalid credentials",
 				success: false,
@@ -121,7 +129,7 @@ export const userSignInService = async (userData: TUser): Promise<IUserServiceRe
 			username: userExist.username,
 			email: userExist.email,
 			userImage: userExist.userImage,
-		}
+		};
 
 		// generating a jwt token
 		const jwtToken = generateJsonWebToken(userDataResponse);
@@ -136,9 +144,11 @@ export const userSignInService = async (userData: TUser): Promise<IUserServiceRe
 			axonResponse: axonResponse(200, response),
 		};
 	} catch (error) {
-		if (error instanceof Error) console.log("Error occurred in logging service", error.message);
+		if (error instanceof Error)
+			console.log("Error occurred in logging service", error.message);
 		const response: TResponse = {
-			message: error instanceof Error ? error.message : "An unknown error occurred",
+			message:
+				error instanceof Error ? error.message : "An unknown error occurred",
 			success: false,
 			data: null,
 		};

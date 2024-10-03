@@ -1,4 +1,4 @@
-import type { IJwtUser } from "../middleware/auth.middleware";
+import type { IJwtUser } from "../middleware/auth.middleware.js";
 import { errorMessage } from "./errorResponse.js";
 
 interface UploadedFile extends Express.Multer.File {}
@@ -12,3 +12,16 @@ export const validateUploadImage = (
 	}
 	return errorMessage(false, "");
 };
+
+
+type ValidateCreateWorkspaceControllerRequest = {
+   _id: string,
+   workspace: 'main' | 'axonverse',
+	createdBy: string,
+}
+export const validateCreateWorkspace = ({_id, workspace, createdBy}:ValidateCreateWorkspaceControllerRequest) => {
+	if(!_id || !createdBy || (workspace !== 'main' && workspace !== 'axonverse')) {
+		return errorMessage(true, "incomplete data provided");
+	}
+	return errorMessage(false, "");
+}

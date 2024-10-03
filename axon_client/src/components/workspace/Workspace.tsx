@@ -8,6 +8,7 @@ import { BsThreeDots } from "react-icons/bs";
 import { IoIosArrowForward } from "react-icons/io";
 import WorkspaceModal from "./workspaceModal";
 import { IoIosAdd } from "react-icons/io";
+import { useAuthStore } from "@/stores/auth";
 
 const Workspace = ({ workspaceLink }: { workspaceLink: IUserWorkspace }) => {
 	const [openFolder, setOpenFolder] = useState<boolean>(false);
@@ -68,10 +69,13 @@ const Workspace = ({ workspaceLink }: { workspaceLink: IUserWorkspace }) => {
 						type="button"
 						className="opacity-0 relative active:scale-90 group-hover:opacity-100  hover:bg-neutral-900 p-[3px]  rounded-md"
 						onClick={() => {
-							addNewSubWorkspaceById(
-								workspaceLink._id,
-								workspaceLink.workspace,
-							);
+							if (user?._id) {
+								addNewSubWorkspaceById(
+									workspaceLink._id,
+									user._id,
+									workspaceLink.workspace,
+								);
+							}
 						}}
 					>
 						<IoIosAdd />
@@ -81,10 +85,11 @@ const Workspace = ({ workspaceLink }: { workspaceLink: IUserWorkspace }) => {
 					</div>
 				</div>
 			</div>
-			{openModal && (
+			{openModal && user?._id && (
 				<WorkspaceModal
 					workspaceId={workspaceLink._id}
 					setModal={setOpenModal}
+					userId={user?._id}
 					workspaceType={workspaceLink.workspace}
 				/>
 			)}
@@ -118,6 +123,7 @@ const WorkspaceFolder = ({
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const { addNewSubWorkspaceById, addNewRecentWorkspace } = useWorkspaceStore();
 
+	const { user } = useAuthStore();
 	return (
 		<div className="flex flex-col   gap-[15px]">
 			<div
@@ -165,10 +171,13 @@ const WorkspaceFolder = ({
 						type="button"
 						className="opacity-0 relative active:scale-90 group-hover:opacity-100  hover:bg-neutral-900 p-[3px]  rounded-md"
 						onClick={() => {
-							addNewSubWorkspaceById(
-								workspaceLink._id,
-								workspaceLink.workspace,
-							);
+							if (user?._id) {
+								addNewSubWorkspaceById(
+									workspaceLink._id,
+									user._id,
+									workspaceLink.workspace,
+								);
+							}
 						}}
 					>
 						<IoIosAdd />
@@ -178,10 +187,11 @@ const WorkspaceFolder = ({
 					</div>
 				</div>
 			</div>
-			{openModal && (
+			{openModal && user?._id && (
 				<WorkspaceModal
 					workspaceId={workspaceLink._id}
 					setModal={setOpenModal}
+					userId={user._id}
 					workspaceType={workspaceLink.workspace}
 				/>
 			)}

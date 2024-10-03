@@ -3,14 +3,25 @@
 import { useWorkspaceStore } from "@/stores/workspace";
 import Workspace from "./Workspace";
 import { IoIosAdd } from "react-icons/io";
-import { useEffect } from "react";
+import { useAuthStore } from "@/stores/auth";
+import useCreateNewParentWorkspace from "@/hooks/workspace/useCreateParentWorkspace";
 
 const WorkspaceSection = () => {
 	const workspaceStore = useWorkspaceStore();
+	const { user } = useAuthStore();
+	const { createParentWorkspace } = useCreateNewParentWorkspace();
 
-	useEffect(() => {
-		console.log("Current workspace state:", workspaceStore.workspace);
-	}, [workspaceStore.workspace]);
+	const handleAddWorkspace = (workspaceType: "main" | "axonverse") => {
+		if (!user?._id) return;
+		const { newWorkspaceId, newWorkspaceType } =
+			workspaceStore.addNewParentWorkspace(workspaceType, user._id);
+		createParentWorkspace({
+			_id: newWorkspaceId,
+			createdBy: user._id,
+			workspace: newWorkspaceType,
+			removeWorkspace: workspaceStore.removeWorkspace,
+		});
+	};
 
 	return (
 		<>
@@ -18,9 +29,7 @@ const WorkspaceSection = () => {
 				<span className="text-neutral-600">Main</span>
 				<button
 					type="button"
-					onClick={() => {
-						workspaceStore.addNewParentWorkspace("main");
-					}}
+					onClick={() => handleAddWorkspace("main")}
 					className="opacity-0 group-hover:opacity-100 scale-[1.5]"
 				>
 					<IoIosAdd className="opacity-60 hover:opacity-100 active:scale-[0.9]" />
@@ -28,16 +37,14 @@ const WorkspaceSection = () => {
 			</div>
 			{workspaceStore.workspace?.main?.map((workspaceLink) => {
 				return (
-					<Workspace workspaceLink={workspaceLink} key={workspaceLink.title} />
+					<Workspace workspaceLink={workspaceLink} key={workspaceLink._id} />
 				);
 			})}
 			{(!workspaceStore.workspace.main ||
 				workspaceStore.workspace.main.length === 0) && (
 				<button
 					type="button"
-					onClick={() => {
-						workspaceStore.addNewParentWorkspace("main");
-					}}
+					onClick={() => handleAddWorkspace("main")}
 					className="opacity-100 text-[13px] justify-between p-1 bg-neutral-900 hover:bg-neutral-800 transition-all rounded-md px-2 flex gap-1 items-center"
 				>
 					Create main workspace
@@ -49,7 +56,7 @@ const WorkspaceSection = () => {
 				<button
 					type="button"
 					onClick={() => {
-						workspaceStore.addNewParentWorkspace("axonverse");
+						handleAddWorkspace("axonverse");
 					}}
 					className="opacity-0 group-hover:opacity-100 scale-[1.5]"
 				>
@@ -58,7 +65,7 @@ const WorkspaceSection = () => {
 			</div>
 			{workspaceStore.workspace?.axonverse?.map((workspaceLink) => {
 				return (
-					<Workspace workspaceLink={workspaceLink} key={workspaceLink.title} />
+					<Workspace workspaceLink={workspaceLink} key={workspaceLink._id} />
 				);
 			})}
 			{(!workspaceStore.workspace.axonverse ||
@@ -66,7 +73,7 @@ const WorkspaceSection = () => {
 				<button
 					type="button"
 					onClick={() => {
-						workspaceStore.addNewParentWorkspace("axonverse");
+						handleAddWorkspace("axonverse");
 					}}
 					className="opacity-100 text-nowrap text-[13px] justify-between p-1 bg-neutral-900 hover:bg-neutral-800 transition-all rounded-md px-2 flex gap-1 items-center"
 				>

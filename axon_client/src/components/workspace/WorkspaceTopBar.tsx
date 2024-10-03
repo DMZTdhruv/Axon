@@ -9,6 +9,7 @@ import { useState } from "react";
 import { BsPlus, BsThreeDots } from "react-icons/bs";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import WorkspaceModal from "./workspaceModal";
+import { useAuthStore } from "@/stores/auth";
 
 const WorkspaceTopBar = ({
 	currentWorkspace,
@@ -16,6 +17,7 @@ const WorkspaceTopBar = ({
 }: { currentWorkspace: IUserWorkspace; folders: IRoutes[] }) => {
 	const router = useRouter();
 	const [openModal, setOpenModal] = useState<boolean>(false);
+	const { user } = useAuthStore();
 	return (
 		<div className="flex transition-all z-[1000] parent_backdrop--blur top-0 border-b-2 border-[#262626] sticky gap-[16px] h-[42px] items-center bg-customMain/50">
 			<div className="absolute inset-0 " />
@@ -81,10 +83,11 @@ const WorkspaceTopBar = ({
 						setOpenModal((prev) => !prev);
 					}}
 				/>
-				{openModal && (
+				{openModal && user?._id && (
 					<WorkspaceModal
 						workspaceId={currentWorkspace._id}
 						workspaceType={currentWorkspace.workspace}
+						userId={user._id}
 						setModal={setOpenModal}
 					/>
 				)}

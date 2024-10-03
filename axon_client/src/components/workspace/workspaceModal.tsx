@@ -16,6 +16,7 @@ import WorkspaceModalMoveToSectionFolder from "./WorkspaceModalMoveToSectionFold
 interface WorkspaceModalProps {
 	workspaceId: string;
 	workspaceType: "main" | "axonverse";
+	userId: string;
 	setModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -28,6 +29,7 @@ const WorkspaceModal = ({
 	workspaceId,
 	workspaceType,
 	setModal,
+	userId,
 }: WorkspaceModalProps) => {
 	const workspace = useWorkspaceUtils();
 	const currentWorkspace = workspace.findWorkspace(workspaceId, workspaceType);
@@ -115,7 +117,11 @@ const WorkspaceModal = ({
 							type="button"
 							className="flex group items-center w-full gap-3 py-1 px-2 hover:bg-neutral-800/50 rounded-md cursor-pointer transition-colors"
 							onClick={() => {
-								addNewSubWorkspaceById(currentWorkspace._id, workspaceType);
+								addNewSubWorkspaceById(
+									currentWorkspace._id,
+									userId,
+									workspaceType,
+								);
 							}}
 						>
 							<IoAdd
@@ -139,6 +145,7 @@ const WorkspaceModal = ({
 							<span className="text-sm text-neutral-300">Move to</span>
 							{moveToHover && (
 								<WorkspaceMoveToModal
+									userId={userId}
 									workspaceType={workspaceType}
 									workspaceId={workspaceId}
 									setMoveToHover={setMoveToHover}
@@ -208,12 +215,14 @@ export default WorkspaceModal;
 type TWorkspaceMoveToModalProps = {
 	setMoveToHover: React.Dispatch<SetStateAction<boolean>>;
 	workspaceId: string;
+	userId: string;
 	workspaceType: "main" | "axonverse";
 };
 
 const WorkspaceMoveToModal = ({
 	setMoveToHover,
 	workspaceId,
+	userId,
 	workspaceType,
 }: TWorkspaceMoveToModalProps) => {
 	const workspaceStore = useWorkspaceStore();
@@ -232,6 +241,7 @@ const WorkspaceMoveToModal = ({
 								currentWorkspaceId={workspaceId}
 								workspaceLink={workspaceLink}
 								key={workspaceLink.title}
+								userId={userId}
 								currentWorkspaceType={workspaceType}
 							/>
 						);
@@ -243,6 +253,7 @@ const WorkspaceMoveToModal = ({
 						return (
 							<WorkspaceModalMoveToSectionFolder
 								currentWorkspaceId={workspaceId}
+								userId={userId}
 								workspaceLink={workspaceLink}
 								key={workspaceLink.title}
 								currentWorkspaceType={workspaceType}

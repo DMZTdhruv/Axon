@@ -1,11 +1,10 @@
 import { HiOutlineDocument } from "react-icons/hi";
 import { useWorkspaceStore, type IUserWorkspace } from "@/stores/workspace";
 import Image from "next/image";
-import { useEffect, useState, type ChangeEvent } from "react";
+import { useState, type ChangeEvent } from "react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import useUploadCover from "@/hooks/workspace/useUploadCover";
 import { toast } from "sonner";
-import { AxiosError } from "axios";
 
 const WorkspaceCover = ({
 	currentWorkspace,

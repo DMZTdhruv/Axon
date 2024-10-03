@@ -55,7 +55,10 @@ interface IUserWorkspaceStore {
 		workspaceIcon: string,
 		workspaceCover: string,
 	) => void;
-	addNewParentWorkspace: (workspaceType: "main" | "axonverse") => void;
+	addNewParentWorkspace: (
+		workspaceType: "main" | "axonverse",
+		userId: string,
+	) => { newWorkspaceId: string; newWorkspaceType: "main" | "axonverse" };
 	updateWorkspaceTitleById: (
 		workspaceId: string,
 		title: string,
@@ -78,6 +81,7 @@ interface IUserWorkspaceStore {
 	) => void;
 	addNewSubWorkspaceById: (
 		workspaceId: string,
+		userId: string,
 		workspaceType: "main" | "axonverse",
 	) => void;
 	removeWorkspace: (
@@ -245,11 +249,11 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 	},
 
 	addNewRecentWorkspace: (
-		workspaceId: string,
-		workspaceType: string,
-		workspaceTitle: string,
-		workspaceIcon: string,
-		workspaceCover: string,
+		workspaceId,
+		workspaceType,
+		workspaceTitle,
+		workspaceIcon,
+		workspaceCover,
 	) => {
 		const newVisitedWorkspace: TNavigationWorkspaceContent = {
 			_id: workspaceId,
@@ -307,10 +311,16 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 				},
 			}));
 		}
+
+		return {
+			newWorkspaceId: newWorkspace._id,
+			newWorkspaceType: newWorkspace.workspace,
+		};
 	},
 
 	addNewSubWorkspaceById: (
 		workspaceId: string,
+		userId: string,
 		workspaceType: "main" | "axonverse",
 	) => {
 		if (workspaceType === "main") {
@@ -320,6 +330,7 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 					main: state.workspace.main
 						? addNewSubWorkspaceToParent(
 								state.workspace.main,
+								userId,
 								workspaceId,
 								workspaceType,
 							)
@@ -333,6 +344,7 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 					axonverse: state.workspace.axonverse
 						? addNewSubWorkspaceToParent(
 								state.workspace.axonverse,
+								userId,
 								workspaceId,
 								workspaceType,
 							)
@@ -609,6 +621,7 @@ const removeWorkspaceById = (
 
 const addNewSubWorkspaceToParent = (
 	workspaces: IUserWorkspace[],
+	userId: string,
 	workspaceId: string,
 	workspaceType: "main" | "axonverse",
 ): IUserWorkspace[] => {
@@ -640,6 +653,7 @@ const addNewSubWorkspaceToParent = (
 				...workspace,
 				subPages: addNewSubWorkspaceToParent(
 					workspace.subPages,
+					userId,
 					workspaceId,
 					workspaceType,
 				),

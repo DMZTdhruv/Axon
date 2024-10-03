@@ -1,6 +1,6 @@
-import { API_URL } from "@/utils/constants";
+import type { AxonError } from "@/types";
 import { useMutation } from "@tanstack/react-query";
-import axios, { type AxiosError } from "axios";
+import axios from "axios";
 
 interface UploadCoverResponse {
 	statusCode: number;
@@ -10,13 +10,7 @@ interface UploadCoverResponse {
 		url: string;
 	};
 }
-
-// extension for the Axios error 
-type AxonErrorResponse = {
-	message: string;
-};
-
-type AxonError = AxiosError<AxonErrorResponse>;
+// extension for the Axios error
 interface UploadCoverRequest {
 	workspaceId: string;
 	file: File;
@@ -28,8 +22,6 @@ const uploadCover = async (
 	const formData = new FormData();
 	formData.append("workspaceId", data.workspaceId);
 	formData.append("image", data.file);
-
-	console.log(`${API_URL}/api/workspace/upload`);
 
 	const response = await axios.post(
 		"http://localhost:3001/api/workspace/upload",

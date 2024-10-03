@@ -9,10 +9,12 @@ const WorkspaceModalMoveToSectionFolder = ({
 	workspaceLink,
 	currentWorkspaceId,
 	currentWorkspaceType,
+	userId,
 }: {
 	workspaceLink: IUserWorkspace;
 	currentWorkspaceId: string;
 	currentWorkspaceType: "main" | "axonverse";
+	userId: string;
 }) => {
 	const [openFolder, setOpenFolder] = useState<boolean>(false);
 	const [openModal, setOpenModal] = useState<boolean>(false);
@@ -75,6 +77,7 @@ const WorkspaceModalMoveToSectionFolder = ({
 				<WorkspaceModal
 					workspaceId={workspaceLink._id}
 					setModal={setOpenModal}
+					userId={userId}
 					workspaceType={workspaceLink.workspace}
 				/>
 			)}
@@ -89,6 +92,7 @@ const WorkspaceModalMoveToSectionFolder = ({
 											currentWorkspaceType={currentWorkspaceType}
 											currentWorkspaceId={currentWorkspaceId}
 											key={subPage._id}
+											userId={userId}
 											workspaceLink={subPage}
 										/>
 									);
@@ -109,10 +113,12 @@ const WorkspaceMoveToSubFolder = ({
 	workspaceLink,
 	currentWorkspaceId,
 	currentWorkspaceType,
+	userId,
 }: {
 	workspaceLink: IUserWorkspace;
 	currentWorkspaceId: string;
 	currentWorkspaceType: "main" | "axonverse";
+	userId: string;
 }) => {
 	const [openFolder, setOpenFolder] = useState<boolean>(false);
 	const [openModal, setOpenModal] = useState<boolean>(false);
@@ -173,6 +179,7 @@ const WorkspaceMoveToSubFolder = ({
 				<WorkspaceModal
 					workspaceId={workspaceLink._id}
 					setModal={setOpenModal}
+					userId={userId}
 					workspaceType={workspaceLink.workspace}
 				/>
 			)}
@@ -185,6 +192,7 @@ const WorkspaceMoveToSubFolder = ({
 									<WorkspaceMoveToSubFolder
 										currentWorkspaceType={currentWorkspaceType}
 										key={folderName._id}
+										userId={userId}
 										currentWorkspaceId={currentWorkspaceId}
 										workspaceLink={folderName}
 									/>

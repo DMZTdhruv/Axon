@@ -33,11 +33,12 @@ export interface IUserWorkspace {
 	cover: string | undefined;
 	coverPos: number;
 	workspace: "main" | "axonverse";
+	private: boolean;
 	members: TAuthUser[] | null;
 	parentPageId: string | null;
-	childPageId: string | null;
 	privileges: TPrivileges | null;
 	subPages: IUserWorkspace[];
+	createdBy: string;
 	content: JSONContent | undefined;
 }
 
@@ -93,189 +94,14 @@ interface IUserWorkspaceStore {
 
 export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 	workspace: {
-		// main: [
-		// 	{
-		// 		_id: "myDashboard1",
-		// 		title: "Dhruv dashboard",
-		// 		icon: "homeIcon.svg",
-		// 		cover: "airport.jpeg",
-		// 		coverPos: 50,
-		// 		workspace: "main",
-		// 		members: null,
-		// 		parentPageId: null,
-		// 		childPageId: "subPage1",
-		// 		privileges: null,
-		// 		content: undefined,
-		// 		subPages: [
-		// 			{
-		// 				_id: "subPage1",
-		// 				title: "Todo list",
-		// 				icon: "pageIcon.svg",
-		// 				cover: "singapore3.jpeg",
-		// 				workspace: "main",
-		// 				coverPos: 50,
-		// 				members: null,
-		// 				parentPageId: "myDashboard1",
-		// 				childPageId: "subSubPage1",
-		// 				privileges: null,
-		// 				content: undefined,
-		// 				subPages: [
-		// 					{
-		// 						_id: "subSubPage1",
-		// 						title: "Startup Ideas",
-		// 						icon: "homeIcon.svg",
-		// 						cover:
-		// 							"birthday house decoration barbie house decoration games birthday house decoration ideas bridal house.jpg",
-		// 						workspace: "main",
-		// 						coverPos: 50,
-		// 						members: null,
-		// 						parentPageId: "subPage1",
-		// 						childPageId: null,
-		// 						privileges: null,
-		// 						content: undefined,
-		// 						subPages: [
-		// 							{
-		// 								_id: "subSubSubPage1",
-		// 								title: "WBBA-Beyblade",
-		// 								icon: "homeIcon.svg",
-		// 								cover: undefined,
-		// 								coverPos: 50,
-		// 								workspace: "main",
-		// 								members: null,
-		// 								parentPageId: "subSubPage1",
-		// 								childPageId: null,
-		// 								privileges: null,
-		// 								content: undefined,
-		// 								subPages: [],
-		// 							},
-		// 						],
-		// 					},
-		// 				],
-		// 			},
-		// 			{
-		// 				_id: "subPage2",
-		// 				title: "Meetings",
-		// 				icon: "usersIcon.svg",
-		// 				cover: "GVTIye_awAAS9lW.jpg",
-		// 				coverPos: 50,
-		// 				workspace: "main",
-		// 				members: null,
-		// 				parentPageId: "myDashboard1",
-		// 				childPageId: null,
-		// 				privileges: null,
-		// 				content: undefined,
-		// 				subPages: [],
-		// 			},
-		// 		],
-		// 	},
-		// 	{
-		// 		_id: "dashboard2",
-		// 		title: "Goals before 2024",
-		// 		icon: "clockIcon.svg",
-		// 		cover: "singapore2.jpg",
-		// 		coverPos: 50,
-		// 		workspace: "main",
-		// 		members: null,
-		// 		parentPageId: null,
-		// 		childPageId: "subPage3",
-		// 		privileges: null,
-		// 		content: undefined,
-		// 		subPages: [
-		// 			{
-		// 				_id: "subPage3",
-		// 				title: "Physique",
-		// 				icon: "fireIcon.svg",
-		// 				cover: undefined,
-		// 				workspace: "main",
-		// 				members: null,
-		// 				parentPageId: "dashboard2",
-		// 				coverPos: 50,
-		// 				childPageId: "subSubPage2",
-		// 				privileges: null,
-		// 				content: undefined,
-		// 				subPages: [
-		// 					{
-		// 						_id: "subSubPage2",
-		// 						title: "Alpha Details",
-		// 						icon: "homeIcon.svg",
-		// 						cover: undefined,
-		// 						workspace: "main",
-		// 						coverPos: 50,
-		// 						members: null,
-		// 						parentPageId: "subPage3",
-		// 						childPageId: null,
-		// 						privileges: null,
-		// 						content: undefined,
-		// 						subPages: [],
-		// 					},
-		// 				],
-		// 			},
-		// 			{
-		// 				_id: "subPage4",
-		// 				title: "Investment",
-		// 				icon: "walletIcon.svg",
-		// 				cover: undefined,
-		// 				workspace: "main",
-		// 				coverPos: 50,
-		// 				members: null,
-		// 				parentPageId: "dashboard2",
-		// 				childPageId: null,
-		// 				privileges: null,
-		// 				content: undefined,
-		// 				subPages: [],
-		// 			},
-		// 		],
-		// 	},
-		// 	{
-		// 		_id: "dashboard3",
-		// 		title: "Study Materials",
-		// 		icon: "bookIcon.svg",
-		// 		cover: "singapore3.jpeg",
-		// 		coverPos: 50,
-		// 		workspace: "main",
-		// 		members: null,
-		// 		parentPageId: null,
-		// 		childPageId: null,
-		// 		privileges: null,
-		// 		content: undefined,
-		// 		subPages: [],
-		// 	},
-		// 	{
-		// 		_id: "dashboard4",
-		// 		title: "Photography",
-		// 		icon: "cameraIcon.svg",
-		// 		cover: undefined,
-		// 		coverPos: 50,
-		// 		workspace: "main",
-		// 		members: null,
-		// 		parentPageId: null,
-		// 		childPageId: null,
-		// 		privileges: null,
-		// 		content: undefined,
-		// 		subPages: [],
-		// 	},
-		// ],
-		// axonverse: [
-		// 	{
-		// 		_id: "axonverseId",
-		// 		title: "axonverse dashboard",
-		// 		icon: "homeIcon.svg",
-		// 		cover: "airport.jpeg",
-		// 		coverPos: 50,
-		// 		workspace: "axonverse",
-		// 		members: null,
-		// 		parentPageId: null,
-		// 		childPageId: "subPage1",
-		// 		privileges: null,
-		// 		content: undefined,
-		// 		subPages: [],
-		// 	},
-		// ],
 		main: null,
 		axonverse: null,
 		recent: null,
 	},
-
+	creatingParentWorkspaceLoading: false,
+	creatingSubWorkspaceLoading: false,
+	errorCreatingParentWorkspace: "",
+	errorCreatingSubWorkspace: "",
 	updateWorkspaceTitleById: (
 		workspaceId: string,
 		title: string,
@@ -445,18 +271,19 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 		}));
 	},
 
-	addNewParentWorkspace: (workspaceType: "main" | "axonverse") => {
+	addNewParentWorkspace: (workspaceType, userId) => {
 		const newWorkspace: IUserWorkspace = {
 			_id: uuidv4(),
 			title: "Untitled",
 			icon: "axon_logo.svg",
 			cover: "",
+			private: true,
 			workspace: workspaceType,
 			coverPos: 50,
 			members: null,
 			parentPageId: null,
-			childPageId: null,
 			privileges: null,
+			createdBy: userId,
 			content: undefined,
 			subPages: [],
 		};
@@ -790,11 +617,12 @@ const addNewSubWorkspaceToParent = (
 		title: "Untitled",
 		icon: "axon_logo.svg",
 		cover: undefined,
+		private: true,
 		coverPos: 50,
 		workspace: workspaceType,
 		members: null,
+		createdBy: userId,
 		parentPageId: workspaceId,
-		childPageId: null,
 		privileges: null,
 		content: undefined,
 		subPages: [],

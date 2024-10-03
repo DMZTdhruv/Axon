@@ -50,7 +50,6 @@ const AxonWorkspace = ({
 			workspace: currentWorkspace.workspace,
 			title: currentWorkspace.title || "untitled",
 			parentPageId: currentWorkspace?.parentPageId,
-			childPageId: currentWorkspace?.childPageId,
 		};
 		traversePreviousNodes(demoObject, []);
 	}

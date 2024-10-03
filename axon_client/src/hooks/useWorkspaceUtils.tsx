@@ -5,7 +5,6 @@ interface IRoutes {
 	title: string;
 	workspace: string;
 	parentPageId: string | null;
-	childPageId: string | null;
 }
 
 const useWorkspaceUtils = () => {
@@ -57,7 +56,6 @@ const useWorkspaceUtils = () => {
 					title: workspace.title || "untitled",
 					workspace: workspace.workspace,
 					parentPageId: workspace.parentPageId,
-					childPageId: workspace.childPageId,
 				};
 			}
 			if (workspace.subPages) {
@@ -71,7 +69,6 @@ const useWorkspaceUtils = () => {
 						title: foundedWorkspace.title || "untitled",
 						workspace: workspace.workspace,
 						parentPageId: foundedWorkspace.parentPageId,
-						childPageId: foundedWorkspace.childPageId,
 					};
 				}
 			}

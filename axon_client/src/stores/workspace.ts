@@ -1,12 +1,16 @@
-import WorkspaceCover from "@/components/workspace/WorkspaceCover";
-import type { TAuthUser, TNavigationWorkspaceContent } from "@/types";
+import type {
+	AxonError,
+	TAuthUser,
+	TNavigationWorkspaceContent,
+} from "@/types";
 import type { JSONContent } from "novel";
 import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
+import type { CreateParentWorkspaceRequest } from "@/hooks/workspace/useCreateParentWorkspace";
 
 type TPrivileges = {
 	_id: string;
-	role: string[];
+	role: "owner" | "visitor";
 };
 
 type TCreatedBy = TAuthUser & {
@@ -48,6 +52,10 @@ interface IUserWorkspaceStore {
 		axonverse: IUserWorkspace[] | null;
 		recent: TNavigationWorkspaceContent[] | null;
 	};
+	creatingParentWorkspaceLoading: boolean;
+	creatingSubWorkspaceLoading: boolean;
+	errorCreatingParentWorkspace: string;
+	errorCreatingSubWorkspace: string;
 	addNewRecentWorkspace: (
 		workspaceId: string,
 		workspaceType: string,

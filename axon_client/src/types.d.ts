@@ -1,41 +1,42 @@
+import type { AxiosError } from "axios";
+
 export type TMenuItem = {
-  _id: string;
-  icon: string;
-  title: string;
-  url: string;
+	_id: string;
+	icon: string;
+	title: string;
+	url: string;
 };
 export interface IRoutes {
-  _id: string;
-  title: string;
-  workspace: string;
-  parentPageId: string | null;
-  childPageId: string | null;
+	_id: string;
+	title: string;
+	workspace: string;
+	parentPageId: string | null;
 }
 export type TWorkspaceItems = TMenuItem & {
-  workSpace: string;
-  parentPageId: null | string;
-  childPageId: null | string;
-  content?: [];
-  subPages: TWorkspaceItems[];
+	workSpace: string;
+	parentPageId: null | string;
+	childPageId: null | string;
+	content?: [];
+	subPages: TWorkspaceItems[];
 };
 
 export type TUser = {
-  email: string;
-  username: string;
-  password: string;
-  userImage?: string;
+	email: string;
+	username: string;
+	password: string;
+	userImage?: string;
 };
 
 export type TAuthUser = {
-  _id: string;
-  userImage?: string;
-  username: string;
+	_id: string;
+	userImage?: string;
+	username: string;
 };
 
 export type TResponse = {
-  message: string;
-  success: boolean;
-  data: TAuthUser;
+	message: string;
+	success: boolean;
+	data: TAuthUser;
 };
 
 export type TNavigationWorkspaceContent = {
@@ -46,3 +47,8 @@ export type TNavigationWorkspaceContent = {
 	workspaceType: string;
 };
 
+type AxonErrorResponse = {
+	message: string;
+};
+
+export type AxonError = AxiosError<AxonErrorResponse>;

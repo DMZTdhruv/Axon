@@ -16,10 +16,13 @@ const Workspace = ({ workspaceLink }: { workspaceLink: IUserWorkspace }) => {
 	const isActive = path.includes(workspaceLink._id);
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const { addNewSubWorkspaceById, addNewRecentWorkspace } = useWorkspaceStore();
+
+	const { user } = useAuthStore();
+
 	return (
 		<div
 			key={workspaceLink._id}
-			className="flex  relative z-[10] flex-col gap-[15px]"
+			className="flex animate-in fade-in-0  relative z-[10] flex-col gap-[15px]"
 		>
 			{/* <div className="absolute top-[-5px] left-[-5px] rounded-lg bg-[#262626] w-full p-2 h-[29px]" /> */}
 			<div

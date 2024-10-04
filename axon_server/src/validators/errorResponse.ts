@@ -1,4 +1,4 @@
-import type { ErrorMessageReturn } from "../types.js";
+import type { ErrorMessageReturn } from "../types/types.js";
 
 export const errorMessage = (
 	isError: boolean,

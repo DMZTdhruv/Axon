@@ -1,4 +1,4 @@
-import type { TValidateResponse } from "../types.js";
+import type { TValidateResponse } from "../types/types.js";
 import type { TUser } from "../types/types.js";
 import { errorMessage } from "./errorResponse.js";
 

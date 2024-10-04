@@ -1,5 +1,5 @@
 import User from "../models/user.model.js";
-import type { ErrorMessageReturn, IUser } from "../types.js";
+import type { ErrorMessageReturn, IUser } from "../types/types.js";
 import type { TUser } from "../types/types.js";
 import { hashPassword } from "../utils/hash.utils.js";
 import { errorMessage } from "../validators/errorResponse.js";

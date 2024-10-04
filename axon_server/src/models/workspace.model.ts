@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import type { IContent, IWorkspace } from "../types.js";
+import type { IContent, IWorkspace } from "../types/types.js";
 
 const workspaceContentSchema = new mongoose.Schema<IContent>(
 	{
@@ -27,13 +27,13 @@ const workspaceSchema = new mongoose.Schema<IWorkspace>(
 		parentPageId: { type: String, ref: "Workspace", default: null },
 		privileges: [
 			{
-				userId: { type:mongoose.Types.ObjectId, ref: "User", required: true },
+				userId: { type: mongoose.Types.ObjectId, ref: "User", required: true },
 				role: { type: String, enum: ["owner", "visitor"], required: true },
 			},
 		],
 		subPages: [{ type: String, ref: "Workspace" }],
-		contentId: { type: mongoose.Types.ObjectId, ref: "WorkspaceContent"},
-		createdBy: { type: mongoose.Types.ObjectId, ref: 'User', required: true }
+		contentId: { type: mongoose.Types.ObjectId, ref: "WorkspaceContent" },
+		createdBy: { type: mongoose.Types.ObjectId, ref: "User", required: true },
 	},
 	{
 		timestamps: true,

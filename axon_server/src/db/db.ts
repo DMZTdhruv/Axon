@@ -5,7 +5,6 @@ dotenv.config({ path: ".env" });
 export const connectToDb = async () => {
 	try {
 		const DATABASE_URI = process.env.DATABASE_URI;
-		console.log(DATABASE_URI);
 		if (!DATABASE_URI) {
 			throw new Error("🔴 no database url provided");
 		}

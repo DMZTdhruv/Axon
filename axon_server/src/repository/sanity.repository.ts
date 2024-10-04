@@ -1,6 +1,6 @@
 import { client } from "../db/sanity.js";
 import fs from "node:fs";
-import type { UploadImageParams, UploadImageReturn } from "../types.js";
+import type { UploadImageParams, UploadImageReturn } from "../types/types.js";
 
 export class SanityRepository {
 	async uploadImage({

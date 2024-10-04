@@ -43,7 +43,7 @@ const createParentWorkspace = ({
 		.catch((error: AxonError) => {
 			removeWorkspace(_id, workspace);
 			console.error("Error creating workspace:", error.message);
-			toast.error(error.response?.data?.message || error.message, {
+			toast.error("Failed to create new workspace", {
 				description: `Failed to create the workspace with id: ${_id}`,
 				className: "bg-neutral-900 border border-neutral-800",
 				action: {

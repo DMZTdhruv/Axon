@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { uploadImageService } from "../../service/workspace/uploadImage.service.js";
-import type { UploadedFile } from "../../types.js";
+import type { UploadedFile } from "../../types/types.js";
 import { validateUploadImage } from "../../validators/workspace.validator.js";
 
 type UploadImageBody = {

@@ -3,14 +3,10 @@ import { validateCreateWorkspace } from "../../validators/workspace.validator.js
 import type { TCreateWorkspaceControllerRequest } from "../../types/types.js";
 import { createWorkspaceService } from "../../service/workspace/createWorkspace.service.js";
 
-export const createWorkspaceController = async (
-	req: Request,
-	res: Response,
-) => {
+export const createParentWorkspaceController = async (req: Request, res: Response) => {
 	try {
 		const user = req.user;
-		const { _id, workspace, createdBy }: TCreateWorkspaceControllerRequest =
-			req.body;
+		const { _id, workspace, createdBy }: TCreateWorkspaceControllerRequest = req.body;
 		console.log({ _id, workspace, createdBy });
 		// checking if the workspace was created by an authorized user or not
 		if (createdBy !== user._id) {

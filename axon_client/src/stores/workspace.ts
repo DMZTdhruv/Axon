@@ -1,12 +1,15 @@
-import type {
-	AxonError,
-	TAuthUser,
-	TNavigationWorkspaceContent,
-} from "@/types";
+import type { TAuthUser, TNavigationWorkspaceContent } from "@/types";
 import type { JSONContent } from "novel";
 import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
-import type { CreateParentWorkspaceRequest } from "@/hooks/workspace/useCreateParentWorkspace";
+
+type TNavigationWorkspace = {
+	_id: string;
+	title: string;
+	icon: string;
+	cover: string;
+	workspace: "axon" | "axonverse";
+};
 
 type TPrivileges = {
 	_id: string;
@@ -32,7 +35,7 @@ export type TContent = {
 
 export interface IUserWorkspace {
 	_id: string;
-	title: string | undefined;
+	title: string;
 	icon: string | undefined;
 	cover: string | undefined;
 	coverPos: number;
@@ -46,6 +49,13 @@ export interface IUserWorkspace {
 	content: JSONContent | undefined;
 }
 
+export interface WorkspaceStore {
+	data: {
+		main: IUserWorkspace[];
+		axonverse: IUserWorkspace[];
+	};
+}
+
 interface IUserWorkspaceStore {
 	workspace: {
 		main: IUserWorkspace[] | null;
@@ -56,6 +66,8 @@ interface IUserWorkspaceStore {
 	creatingSubWorkspaceLoading: boolean;
 	errorCreatingParentWorkspace: string;
 	errorCreatingSubWorkspace: string;
+	addMainWorkspaces: (mainWorkspaces: IUserWorkspace[]) => void;
+	addAxonverseWorkspaces: (mainWorkspaces: IUserWorkspace[]) => void;
 	addNewRecentWorkspace: (
 		workspaceId: string,
 		workspaceType: string,
@@ -106,19 +118,38 @@ interface IUserWorkspaceStore {
 
 export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 	workspace: {
-		main: null,
-		axonverse: null,
-		recent: null,
+		main: [],
+		axonverse: [],
+		recent: [],
 	},
 	creatingParentWorkspaceLoading: false,
 	creatingSubWorkspaceLoading: false,
 	errorCreatingParentWorkspace: "",
 	errorCreatingSubWorkspace: "",
+
+	addMainWorkspaces(mainWorkspaces) {
+		set((state) => ({
+			workspace: {
+				...state.workspace,
+				main: mainWorkspaces,
+			},
+		}));
+	},
+	addAxonverseWorkspaces(axonverseWorkspaces) {
+		set((state) => ({
+			workspace: {
+				...state.workspace,
+				axonverse: axonverseWorkspaces,
+			},
+		}));
+	},
+
 	updateWorkspaceTitleById: (
 		workspaceId: string,
 		title: string,
 		workspaceType: string,
 	) => {
+		if (title.trim().length === 0) return;
 		if (workspaceType === "main") {
 			set((state) => ({
 				workspace: {
@@ -299,7 +330,6 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 			content: undefined,
 			subPages: [],
 		};
-
 		if (workspaceType === "main") {
 			set((state) => ({
 				workspace: {
@@ -325,6 +355,8 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 			newWorkspaceType: newWorkspace.workspace,
 		};
 	},
+
+	addParentNavigation() {},
 
 	addNewSubWorkspaceById: (
 		workspaceId: string,

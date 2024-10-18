@@ -4,6 +4,7 @@ import { useWorkspaceStore, type IUserWorkspace } from "@/stores/workspace";
 import React, { useState } from "react";
 import { IoIosArrowForward } from "react-icons/io";
 import WorkspaceModal from "./workspaceModal";
+import usePushWorkspace from "@/hooks/workspace/usePushWorkspace";
 
 const WorkspaceModalMoveToSectionFolder = ({
 	workspaceLink,
@@ -19,6 +20,21 @@ const WorkspaceModalMoveToSectionFolder = ({
 	const [openFolder, setOpenFolder] = useState<boolean>(false);
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const { pushWorkspaceToDifferentWorkspace } = useWorkspaceStore();
+	const pushToWorkspace = usePushWorkspace();
+
+	const handlePushWorkspace = () => {
+		pushWorkspaceToDifferentWorkspace(
+			currentWorkspaceId,
+			workspaceLink._id,
+			currentWorkspaceType,
+			workspaceLink.workspace,
+		);
+		pushToWorkspace({
+			currentWorkspaceId,
+			toWorkspaceId: workspaceLink._id,
+			toWorkspaceType: workspaceLink.workspace,
+		})
+	}
 
 	return (
 		<div
@@ -47,15 +63,7 @@ const WorkspaceModalMoveToSectionFolder = ({
 					<button
 						className="flex  gap-2 flex-1 flex-shrink-0 "
 						type="button"
-						onClick={() => {
-							console.log("hello");
-							pushWorkspaceToDifferentWorkspace(
-								currentWorkspaceId,
-								workspaceLink._id,
-								currentWorkspaceType,
-								workspaceLink.workspace,
-							);
-						}}
+						onClick={handlePushWorkspace}
 					>
 						<img
 							width={17}
@@ -122,9 +130,21 @@ const WorkspaceMoveToSubFolder = ({
 }) => {
 	const [openFolder, setOpenFolder] = useState<boolean>(false);
 	const [openModal, setOpenModal] = useState<boolean>(false);
-	const { addNewSubWorkspaceById, addNewRecentWorkspace } = useWorkspaceStore();
 	const { pushWorkspaceToDifferentWorkspace } = useWorkspaceStore();
-
+	const pushToWorkspace = usePushWorkspace();
+	const handlePushWorkspace = () => {
+		pushWorkspaceToDifferentWorkspace(
+			currentWorkspaceId,
+			workspaceLink._id,
+			currentWorkspaceType,
+			workspaceLink.workspace,
+		);
+		pushToWorkspace({
+			currentWorkspaceId,
+			toWorkspaceId: workspaceLink._id,
+			toWorkspaceType: workspaceLink.workspace,
+		})
+	}
 	return (
 		<div className="flex flex-col ">
 			<div
@@ -149,15 +169,7 @@ const WorkspaceMoveToSubFolder = ({
 					<button
 						type="button"
 						className="flex flex-1 flex-shrink-0  gap-2"
-						onClick={() => {
-							console.log("hello");
-							pushWorkspaceToDifferentWorkspace(
-								currentWorkspaceId,
-								workspaceLink._id,
-								currentWorkspaceType,
-								workspaceLink.workspace,
-							);
-						}}
+						onClick={handlePushWorkspace}
 					>
 						<img
 							width={17}

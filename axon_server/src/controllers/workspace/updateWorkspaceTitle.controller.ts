@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { validateUpdateTitleWorkspace } from "../../validators/workspace.validator.js";
 import updateWorkspaceTitleService from "../../service/workspace/updateWorkspaceTitle.service.js";
+import { internalServerErrorResponse } from "../../constant.js";
 
 type UpdateWorkspaceRenameController = {
 	title: string;
@@ -31,8 +32,10 @@ const updateWorkspaceTitleController = async (req: Request, res: Response) => {
 	} catch (error) {
 		if (error instanceof Error) {
 			console.log(`Error in updateWorkspaceTitleController ${error.message}`);
+			return res.status(500).json(internalServerErrorResponse);
 		}
-		return res.status(500).json({ error: "internal server error" });
+		console.log(`Error in updateWorkspaceTitleController ${error}`);
+		return res.status(500).json(internalServerErrorResponse);
 	}
 };
 

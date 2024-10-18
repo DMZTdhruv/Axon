@@ -19,12 +19,13 @@ const workspaceSchema = new mongoose.Schema<IWorkspace>(
 	{
 		_id: { type: String, required: true },
 		title: { type: String, default: "untitled" },
-		icon: { type: String, default: "axon_logo.svg" },
+		icon: { type: String, default: null },
 		cover: { type: String },
 		coverPos: { type: Number, default: 50 },
 		workspace: { type: String, enum: ["main", "axonverse"], required: true },
 		private: { type: Boolean, default: true },
 		parentPageId: { type: String, ref: "Workspace", default: null },
+		workspaceWidth: { type: String, default: "sm", required: true },
 		privileges: [
 			{
 				userId: { type: mongoose.Types.ObjectId, ref: "User", required: true },
@@ -32,7 +33,11 @@ const workspaceSchema = new mongoose.Schema<IWorkspace>(
 			},
 		],
 		subPages: [{ type: String, ref: "Workspace" }],
-		contentId: { type: mongoose.Types.ObjectId, ref: "WorkspaceContent" },
+		content: {
+			type: mongoose.Types.ObjectId,
+			ref: "WorkspaceContent",
+			default: null,
+		},
 		createdBy: { type: mongoose.Types.ObjectId, ref: "User", required: true },
 	},
 	{

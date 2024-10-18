@@ -13,7 +13,7 @@ const config = withUt({
 	prefix: "",
 	theme: {
 		boxShadow: {
-			textWhiteShadow: '0px 0px 10px rgba(255, 255, 255, 1)',
+			textWhiteShadow: "0px 0px 10px rgba(255, 255, 255, 1)",
 		},
 		container: {
 			center: true,
@@ -24,7 +24,7 @@ const config = withUt({
 		},
 		extend: {
 			colors: {
-				customMain: "#0F0F0F",
+				customMain: "#0f0f0f",
 				customPrimary: "#0D0D0D",
 				border: "hsl(var(--border))",
 				input: "hsl(var(--input))",

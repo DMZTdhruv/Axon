@@ -1,5 +1,11 @@
 import type { AxiosError } from "axios";
 
+export interface CommonWorkspaceResponse {
+	statusCode: number;
+	message: string;
+	data: IUserWorkspace;
+}
+
 export type TMenuItem = {
 	_id: string;
 	icon: string;
@@ -43,12 +49,20 @@ export type TNavigationWorkspaceContent = {
 	_id: string;
 	title: string | undefined;
 	cover: string | undefined;
-	icon: string | undefined;
+	icon: string | null;
 	workspaceType: string;
 };
 
 type AxonErrorResponse = {
+	data: any;
 	message: string;
 };
 
 export type AxonError = AxiosError<AxonErrorResponse>;
+const some: AxonError = {
+	status: "error",
+	message: "",
+	response: {
+		data,
+	}
+};

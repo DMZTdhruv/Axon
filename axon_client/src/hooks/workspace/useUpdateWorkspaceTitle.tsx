@@ -38,7 +38,7 @@ const updateWorkspaceTitle = async ({
 	};
 
 	axios
-		.post("http://localhost:3001/api/workspace/title/update", requestBody, {
+		.post("http://localhost:3001/api/workspace/title/transaction", requestBody, {
 			withCredentials: true,
 		})
 		.catch((error: AxonError) => {

@@ -25,7 +25,7 @@ export const userSignUpService = async (
 		if (validation.error) {
 			const response: TResponse = {
 				message: validation.errorMessage,
-				success: false,
+				status: "error",
 				data: null,
 			};
 			return {
@@ -39,7 +39,7 @@ export const userSignUpService = async (
 		if (userExist?._id) {
 			const response: TResponse = {
 				message: "user already exists",
-				success: false,
+				status: "error",
 				data: userExist,
 			};
 			return {
@@ -52,7 +52,7 @@ export const userSignUpService = async (
 		const newUser = await userRepo.createUser(userData);
 		const response: TResponse = {
 			message: "new user created",
-			success: true,
+			status: "success",
 			data: newUser,
 		};
 
@@ -68,7 +68,7 @@ export const userSignUpService = async (
 		const response: TResponse = {
 			message:
 				error instanceof Error ? error.message : "An unknown error occurred",
-			success: false,
+			status: "error",
 			data: null,
 		};
 		return {
@@ -88,7 +88,7 @@ export const userSignInService = async (
 		if (validation.error) {
 			const response: TResponse = {
 				message: validation.errorMessage,
-				success: false,
+				status: "error",
 				data: null,
 			};
 			return {
@@ -102,7 +102,7 @@ export const userSignInService = async (
 		if (!userExist) {
 			const response: TResponse = {
 				message: "user doesn't exists",
-				success: false,
+				status: "error",
 				data: null,
 			};
 			return {
@@ -115,7 +115,7 @@ export const userSignInService = async (
 		if (!(await checkHashPassword(userData.password, userExist.password))) {
 			const response: TResponse = {
 				message: "invalid credentials",
-				success: false,
+				status: "error",
 				data: null,
 			};
 			return {
@@ -136,7 +136,7 @@ export const userSignInService = async (
 
 		const response: TResponse = {
 			message: "signed in successfully",
-			success: true,
+			status: "success",
 			data: userDataResponse,
 		};
 		return {
@@ -149,7 +149,7 @@ export const userSignInService = async (
 		const response: TResponse = {
 			message:
 				error instanceof Error ? error.message : "An unknown error occurred",
-			success: false,
+			status: "error",
 			data: null,
 		};
 		return {

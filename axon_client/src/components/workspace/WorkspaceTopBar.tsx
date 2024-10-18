@@ -10,6 +10,8 @@ import { BsPlus, BsThreeDots } from "react-icons/bs";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import WorkspaceModal from "./workspaceModal";
 import { useAuthStore } from "@/stores/auth";
+import DynamicIcon from "../ui/DynamicIcon";
+import DynamicTopBarIcon from "../ui/DynamicTopBarIcon";
 
 const WorkspaceTopBar = ({
 	currentWorkspace,
@@ -18,8 +20,11 @@ const WorkspaceTopBar = ({
 	const router = useRouter();
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const { user } = useAuthStore();
+
+	const extraWorkspaces: IUserWorkspace[] = [];
+
 	return (
-		<div className="flex transition-all z-[1000] parent_backdrop--blur top-0 border-b-2 border-[#262626] sticky gap-[16px] h-[42px] items-center bg-customMain/50">
+		<div className="flex transition-all z-[1000] workspace-top-bar top-0  border-[#262626] sticky gap-[16px] h-[42px] items-center bg-customMain/50">
 			<div className="absolute inset-0 " />
 			<div className="flex ml-2 gap-2">
 				<button type="button" className="group">
@@ -42,13 +47,11 @@ const WorkspaceTopBar = ({
 
 			<div className="flex gap-10 relative items-center">
 				<div className="flex gap-2 items-center">
-					<Image
-						alt="workspace_icon"
-						src={`/assets/${currentWorkspace.icon}`}
-						height={17}
-						width={17}
-						draggable={false}
-						className=" mb-[1px]  select-none "
+					<DynamicTopBarIcon
+						height={15}
+						width={15}
+						name={currentWorkspace.icon}
+						DClassName="select-none"
 					/>
 					<div className="text-[13px] items-center gap-[5px] flex">
 						{folders.map((folder, index) => {
@@ -100,3 +103,65 @@ const WorkspaceTopBar = ({
 };
 
 export default WorkspaceTopBar;
+
+// type TabProps = {
+// 	workspaceIcon: string,
+// 	folders
+// }
+
+// const Tab = ({workspace}) => {
+// 	return (
+// 		<div className="flex gap-10 relative items-center">
+// 			<div className="flex gap-2 items-center">
+// 				<Image
+// 					alt="workspace_icon"
+// 					src={`/assets/${currentWorkspace.icon}`}
+// 					height={17}
+// 					width={17}
+// 					draggable={false}
+// 					className=" mb-[1px]  select-none "
+// 				/>
+// 				<div className="text-[13px] items-center gap-[5px] flex">
+// 					{folders.map((folder, index) => {
+// 						return (
+// 							<Link
+// 								href={`/workspace/${folder.workspace}/${folder._id}`}
+// 								key={folder._id}
+// 							>
+// 								{folder._id === currentWorkspace?._id ? (
+// 									<span className="hover:underline  shadow_topBar--text ">
+// 										{folder.title}
+// 									</span>
+// 								) : (
+// 									<span className="text-neutral-300  hover:underline">
+// 										{folder.title}
+// 									</span>
+// 								)}
+// 								{index !== folders.length - 1 && " /"}
+// 							</Link>
+// 						);
+// 					})}
+// 					<div className="bg-white rounded-[2.5px]  shadow_topBar--box flex items-center justify-center h-[15px] w-[15px] text-black text-[11px] leading-tight">
+// 						<span className="font-bold">
+// 							{currentWorkspace.workspace === "main" ? "M" : "E "}
+// 						</span>
+// 					</div>
+// 				</div>
+// 			</div>
+// 			<BsThreeDots
+// 				className="hover:bg-white hover:text-black cursor-pointer transition-all rounded-[2.5px] hover:shadow_topBar--box"
+// 				onClick={() => {
+// 					setOpenModal((prev) => !prev);
+// 				}}
+// 			/>
+// 			{openModal && user?._id && (
+// 				<WorkspaceModal
+// 					workspaceId={currentWorkspace._id}
+// 					workspaceType={currentWorkspace.workspace}
+// 					userId={user._id}
+// 					setModal={setOpenModal}
+// 				/>
+// 			)}
+// 		</div>
+// 	);
+// };

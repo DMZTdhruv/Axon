@@ -29,14 +29,14 @@ const MainNavigation = () => {
 		});
 
 	return (
-		<div className="px-[40px] py-[20px] space-y-[20px]">
+		<div className="px-[40px] py-[40px] space-y-[20px]">
 			<h2 className="font-bold text-[18px] text_glow ">
 				Navigate easily to any page here
 			</h2>
 			<div className="flex gap-[20px] flex-col">
 				<div className="flex flex-col gap-[10px]">
 					{workspaceStore.workspace.main?.length !== 0 && (
-						<p className="text-[#595959] text-[13px]">Main</p>
+						<p className="text-[#595959] text-[13px]">main</p>
 					)}
 					<div className="flex gap-[10px] -translate-x-[5px]">
 						{mainWorkspaceList?.map((mainNavItems) => (
@@ -53,7 +53,7 @@ const MainNavigation = () => {
 				</div>
 				<div className="flex flex-col gap-[10px]">
 					{workspaceStore.workspace.axonverse?.length !== 0 && (
-						<p className="text-[#595959] text-[13px]">Axonverse</p>
+						<p className="text-[#595959] text-[13px]">axonverse</p>
 					)}
 					<div className="flex gap-[10px] -translate-x-[5px]">
 						{axonverseWorkspaceList?.map((mainNavItems) => (
@@ -70,7 +70,7 @@ const MainNavigation = () => {
 				</div>
 				{workspaceStore.workspace.recent?.length !== 0 && (
 					<div className="flex flex-col gap-[10px]">
-						<p className="text-[#595959] text-[13px]">Recently visited</p>
+						<p className="text-[#595959] text-[13px]">recently visited</p>
 						<div className="flex gap-[10px] -translate-x-[5px]">
 							{workspaceStore.workspace.recent?.map((recentWorkspace) => {
 								return (

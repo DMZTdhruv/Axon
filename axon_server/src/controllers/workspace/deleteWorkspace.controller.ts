@@ -1,14 +1,12 @@
 import type { Request, Response } from "express";
 import deleteWorkspaceService from "../../service/workspace/deleteWorkspace.service.js";
 import { validateDeleteWorkspace } from "../../validators/workspace.validator.js";
+import { internalServerErrorResponse } from "../../constant.js";
 
 const deleteWorkspaceController = async (req: Request, res: Response) => {
 	try {
 		const user = req.user;
 		const { workspaceId } = req.params;
-		console.log("////////////////////////////////////////////////////////////////////////////////////////////////////////")
-		console.log({ userId: user._id, workspaceId });
-		console.log("////////////////////////////////////////////////////////////////////////////////////////////////////////")
 		const { error, errorMessage } = validateDeleteWorkspace(
 			user._id,
 			workspaceId,
@@ -24,8 +22,10 @@ const deleteWorkspaceController = async (req: Request, res: Response) => {
 	} catch (error) {
 		if (error instanceof Error) {
 			console.log(`Error in deleteWorkspaceController ${error.message}`);
+			return res.status(500).json(internalServerErrorResponse);
 		}
-		return res.status(500).json({ error: "internal server error" });
+		console.log(`Error in deleteWorkspaceController ${error}`);
+		return res.status(500).json(internalServerErrorResponse);
 	}
 };
 

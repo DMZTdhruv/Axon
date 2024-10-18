@@ -10,6 +10,7 @@ interface UploadCoverResponse {
 		url: string;
 	};
 }
+
 // extension for the Axios error
 interface UploadCoverRequest {
 	workspaceId: string;
@@ -24,7 +25,7 @@ const uploadCover = async (
 	formData.append("image", data.file);
 
 	const response = await axios.post(
-		"http://localhost:3001/api/workspace/upload",
+		"http://localhost:3001/api/workspace/cover/upload/transaction",
 		formData,
 		{
 			withCredentials: true,

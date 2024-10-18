@@ -11,11 +11,16 @@ import { useEffect } from "react";
 import { Skeleton } from "../ui/skeleton";
 import { toast } from "sonner";
 import type { AxonError } from "@/types";
+import { useRouter } from "next/navigation";
+
 
 const WorkspaceSection = () => {
 	const workspaceStore = useWorkspaceStore();
+	const { allWorkspacesFetched, handleAllWorkspacesLoaded } =
+		useWorkspaceStore();
 	const { user } = useAuthStore();
 	const { createParentWorkspace } = useCreateNewParentWorkspace();
+	const router = useRouter();
 
 	const handleAddWorkspace = (workspaceType: "main" | "axonverse") => {
 		if (!user?._id) return;
@@ -27,6 +32,7 @@ const WorkspaceSection = () => {
 			workspace: newWorkspaceType,
 			removeWorkspace: workspaceStore.removeWorkspace,
 		});
+		router.push(`/workspace/${newWorkspaceType}/${newWorkspaceId}`);
 	};
 
 	const fetchWorkspaces = async (): Promise<WorkspaceStore> => {
@@ -45,6 +51,7 @@ const WorkspaceSection = () => {
 	>({
 		queryKey: ["workspaces"],
 		queryFn: fetchWorkspaces,
+		refetchOnWindowFocus: false,
 	});
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
@@ -54,6 +61,10 @@ const WorkspaceSection = () => {
 			workspaceStore.addAxonverseWorkspaces(data.data.axonverse);
 		}
 	}, [data]);
+
+	useEffect(() => {
+		handleAllWorkspacesLoaded(!isLoading);
+	}, [isLoading, handleAllWorkspacesLoaded]);
 
 	useEffect(() => {
 		if (isError) {
@@ -70,8 +81,8 @@ const WorkspaceSection = () => {
 
 	return (
 		<>
-			<div className="text-[10px] flex items-center justify-between gap-1 group ">
-				<span className="text-neutral-600">Main</span>
+			<div className="text-[11px] flex items-center justify-between gap-1 group ">
+				<span className="text-neutral-500">main</span>
 				{!isLoading && (
 					<button
 						type="button"
@@ -106,7 +117,7 @@ const WorkspaceSection = () => {
 				)
 			)}
 			<div className="text-[10px] flex items-center justify-between gap-1 group ">
-				<span className="text-neutral-600">Axonverse</span>
+				<span className="text-neutral-500">axonverse</span>
 				{!isLoading && (
 					<button
 						type="button"

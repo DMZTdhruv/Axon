@@ -31,7 +31,7 @@ const createParentWorkspace = ({
 	};
 	axios
 		.post(
-			"http://localhost:3001/api/workspace/create-parent-workspace",
+			"http://localhost:3001/api/workspace/new",
 			workspaceData,
 			{
 				withCredentials: true,

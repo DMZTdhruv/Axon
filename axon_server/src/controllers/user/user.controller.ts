@@ -5,6 +5,7 @@ import {
 import type { TUser } from "../../types/types.js";
 import type { Request, Response } from "express";
 import type { TResponse } from "../../utils/axonResponse.js";
+import { internalServerErrorResponse } from "../../constant.js";
 const AXON_USER: string = "axon_user";
 
 export const userSingUpController = async (req: Request, res: Response) => {
@@ -29,7 +30,7 @@ export const userSingUpController = async (req: Request, res: Response) => {
 	} catch (error) {
 		if (error instanceof Error)
 			console.log("Error occurred in controller", error.message);
-		return res.status(500).json({ error: "internal server error" });
+		return res.status(500).json(internalServerErrorResponse);
 	}
 };
 
@@ -49,14 +50,14 @@ export const userSignOutController = async (req: Request, res: Response) => {
 		const response: TResponse = {
 			message: "signed out successfully",
 			data: null,
-			success: true,
+			status: "success",
 		};
 
 		return res.status(200).json({ response });
 	} catch (error) {
 		if (error instanceof Error)
 			console.log("Error occurred in controller", error.message);
-		return res.status(500).json({ error: "internal server error" });
+		return res.status(500).json(internalServerErrorResponse);
 	}
 };
 
@@ -80,6 +81,6 @@ export const userLogInController = async (req: Request, res: Response) => {
 	} catch (error) {
 		if (error instanceof Error)
 			console.log("Error occurred in userLogIn controller", error.message);
-		return res.status(500).json({ error: "internal server error" });
+		return res.status(500).json(internalServerErrorResponse);
 	}
 };

@@ -36,9 +36,10 @@ export type TContent = {
 export interface IUserWorkspace {
 	_id: string;
 	title: string;
-	icon: string | undefined;
+	icon: string | null;
 	cover: string | undefined;
 	coverPos: number;
+	workspaceWidth: "sm" | "lg";
 	workspace: "main" | "axonverse";
 	private: boolean;
 	members: TAuthUser[] | null;
@@ -46,7 +47,7 @@ export interface IUserWorkspace {
 	privileges: TPrivileges | null;
 	subPages: IUserWorkspace[];
 	createdBy: string;
-	content: JSONContent | undefined;
+	content: JSONContent | null;
 }
 
 export interface WorkspaceStore {
@@ -56,18 +57,54 @@ export interface WorkspaceStore {
 	};
 }
 
+type SavingContentParams = {
+	workspaceId: string;
+	workspaceType: "axonverse" | "main";
+	savingStatus: boolean;
+};
+
+type SavingContent = {
+	workspaceId: string | null;
+	workspaceType: "axonverse" | "main" | null;
+	savingStatus: boolean;
+};
+
 interface IUserWorkspaceStore {
 	workspace: {
 		main: IUserWorkspace[] | null;
 		axonverse: IUserWorkspace[] | null;
 		recent: TNavigationWorkspaceContent[] | null;
 	};
-	creatingParentWorkspaceLoading: boolean;
-	creatingSubWorkspaceLoading: boolean;
-	errorCreatingParentWorkspace: string;
-	errorCreatingSubWorkspace: string;
+
+	// Loading states
+	savingContent: SavingContent;
+	allWorkspacesFetched: boolean;
+
+	// update boolean state
+	updateSavingContent: (savingParams: SavingContent) => void;
+	handleAllWorkspacesLoaded: (value: boolean) => void;
+	// Workspace management
 	addMainWorkspaces: (mainWorkspaces: IUserWorkspace[]) => void;
 	addAxonverseWorkspaces: (mainWorkspaces: IUserWorkspace[]) => void;
+
+	updateWorkspaceIcon: (
+		workspaceId: string,
+		workspaceType: string,
+		icon: string | null,
+	) => void;
+	addNewParentWorkspace: (
+		workspaceType: "main" | "axonverse",
+		userId: string,
+	) => { newWorkspaceId: string; newWorkspaceType: "main" | "axonverse" };
+	addNewSubWorkspaceById: (
+		workspaceId: string,
+		userId: string,
+		workspaceType: "main" | "axonverse",
+	) => {
+		newWorkspaceId: string;
+		newWorkspaceType: "main" | "axonverse";
+		newWorkspaceParentPageId: string | null;
+	};
 	addNewRecentWorkspace: (
 		workspaceId: string,
 		workspaceType: string,
@@ -75,10 +112,12 @@ interface IUserWorkspaceStore {
 		workspaceIcon: string,
 		workspaceCover: string,
 	) => void;
-	addNewParentWorkspace: (
+	removeWorkspace: (
+		workspaceId: string,
 		workspaceType: "main" | "axonverse",
-		userId: string,
-	) => { newWorkspaceId: string; newWorkspaceType: "main" | "axonverse" };
+	) => void;
+
+	// Workspace updates
 	updateWorkspaceTitleById: (
 		workspaceId: string,
 		title: string,
@@ -91,23 +130,21 @@ interface IUserWorkspaceStore {
 	) => void;
 	updateWorkspaceCover: (
 		workspaceId: string,
-		workspaceType: string,
+		workspaceType: "main" | "axonverse",
 		workspaceCover: string,
+	) => void;
+	updateWorkspaceWidth: (
+		workspaceId: string,
+		workspaceType: "main" | "axonverse",
+		width: "sm" | "lg",
 	) => void;
 	updateWorkspaceCoverYPosition: (
 		workspaceId: string,
 		workspaceType: string,
 		yPos: number,
 	) => void;
-	addNewSubWorkspaceById: (
-		workspaceId: string,
-		userId: string,
-		workspaceType: "main" | "axonverse",
-	) => void;
-	removeWorkspace: (
-		workspaceId: string,
-		workspaceType: "main" | "axonverse",
-	) => void;
+
+	// Workspace reorganization
 	pushWorkspaceToDifferentWorkspace: (
 		currentWorkspaceId: string,
 		toWorkspaceId: string,
@@ -122,10 +159,25 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 		axonverse: [],
 		recent: [],
 	},
-	creatingParentWorkspaceLoading: false,
-	creatingSubWorkspaceLoading: false,
-	errorCreatingParentWorkspace: "",
-	errorCreatingSubWorkspace: "",
+	allWorkspacesFetched: false,
+	savingContent: {
+		workspaceId: null,
+		savingStatus: false,
+		workspaceType: null,
+	},
+	updateSavingContent: (savingStateObj) => {
+		set((state) => ({
+			...state,
+			savingContent: { ...savingStateObj },
+		}));
+	},
+
+	handleAllWorkspacesLoaded(value: boolean) {
+		set((state) => ({
+			...state,
+			allWorkspacesFetched: value,
+		}));
+	},
 
 	addMainWorkspaces(mainWorkspaces) {
 		set((state) => ({
@@ -175,115 +227,134 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 		}
 	},
 
-	pushWorkspaceToDifferentWorkspace: (
+	updateWorkspaceWidth: (
+		workspaceId: string,
+		workspaceType: "main" | "axonverse",
+		width: "sm" | "lg",
+	) => {
+		if (workspaceType === "main") {
+			set((state) => ({
+				workspace: {
+					...state.workspace,
+					main: state.workspace.main
+						? updateWorkspaceWidthById(state.workspace.main, workspaceId, width)
+						: state.workspace.main,
+				},
+			}));
+		} else {
+			set((state) => ({
+				workspace: {
+					...state.workspace,
+					axonverse: state.workspace.axonverse
+						? updateWorkspaceWidthById(
+								state.workspace.axonverse,
+								workspaceId,
+								width,
+							)
+						: state.workspace.axonverse,
+				},
+			}));
+		}
+	},
+
+	// Zustand store update function
+	pushWorkspaceToDifferentWorkspace(
 		currentWorkspaceId: string,
 		toWorkspaceId: string,
 		workspaceType: "main" | "axonverse",
 		toWorkspaceType: "main" | "axonverse",
-	) => {
+	) {
 		set((state) => {
-			if (state.workspace[workspaceType]) {
-				const findWorkspaceAndRemove = (
-					workspaces: IUserWorkspace[],
-					currentWorkspaceId: string,
-				): IUserWorkspace | undefined => {
-					// Check if the workspace is at the top level
-					const topLevelIndex = workspaces.findIndex(
-						(w) => w._id === currentWorkspaceId,
-					);
-					if (topLevelIndex !== -1) {
-						return workspaces.splice(topLevelIndex, 1)[0];
+			// Create a deep copy of the state to avoid direct mutations
+			const newState = JSON.parse(JSON.stringify(state));
+
+			const findWorkspaceAndRemove = (
+				workspaces: IUserWorkspace[],
+				currentWorkspaceId: string,
+			): IUserWorkspace | undefined => {
+				const index = workspaces.findIndex((w) => w._id === currentWorkspaceId);
+				if (index !== -1) {
+					return workspaces.splice(index, 1)[0];
+				}
+				for (const workspace of workspaces) {
+					if (workspace.subPages) {
+						const found = findWorkspaceAndRemove(
+							workspace.subPages,
+							currentWorkspaceId,
+						);
+						if (found) return found;
 					}
+				}
+				return undefined;
+			};
 
-					// If not at top level, search in subPages
-					for (let i = 0; i < workspaces.length; i++) {
-						if (workspaces[i].subPages && workspaces[i].subPages.length > 0) {
-							const subWorkspace = findWorkspaceAndRemove(
-								workspaces[i].subPages,
-								currentWorkspaceId,
-							);
-							if (subWorkspace) return subWorkspace;
-						}
+			const findToWorkspaceLocation = (
+				workspaces: IUserWorkspace[],
+				toWorkspaceId: string,
+			): IUserWorkspace | undefined => {
+				for (const workspace of workspaces) {
+					if (workspace._id === toWorkspaceId) {
+						return workspace;
 					}
-					return undefined;
-				};
-
-				const findToWorkspaceLocation = (
-					workspaces: IUserWorkspace[],
-					toWorkspaceId: string,
-				): IUserWorkspace | undefined => {
-					for (let i = 0; i < workspaces.length; i++) {
-						if (workspaces[i]._id === toWorkspaceId) {
-							return workspaces[i];
-						}
-						if (workspaces[i].subPages && workspaces[i].subPages.length > 0) {
-							const subWorkspace = findToWorkspaceLocation(
-								workspaces[i].subPages,
-								toWorkspaceId,
-							);
-							if (subWorkspace) return subWorkspace;
-						}
+					if (workspace.subPages) {
+						const found = findToWorkspaceLocation(
+							workspace.subPages,
+							toWorkspaceId,
+						);
+						if (found) return found;
 					}
-					return undefined;
-				};
+				}
+				return undefined;
+			};
 
-				// Create a new copy of the source workspace array
-				const sourceWorkspaces = [...state.workspace[workspaceType]];
-
+			if (newState.workspace[workspaceType]) {
 				const workspaceToMove = findWorkspaceAndRemove(
-					sourceWorkspaces,
+					newState.workspace[workspaceType],
 					currentWorkspaceId,
 				);
 
 				if (!workspaceToMove) {
-					return state;
+					return state; // No changes if workspace not found
 				}
 
-				workspaceToMove.workspace = toWorkspaceType;
+				// Update workspace type recursively
 				const updateWorkspaceType = (
 					workspace: IUserWorkspace,
 					newType: "main" | "axonverse",
 				) => {
 					workspace.workspace = newType;
-					if (workspace.subPages && workspace.subPages.length > 0) {
-						// biome-ignore lint/complexity/noForEach: <explanation>
-						workspace.subPages.forEach((subPage) =>
-							updateWorkspaceType(subPage, newType),
-						);
-					}
+					// biome-ignore lint/complexity/noForEach: <explanation>
+					workspace.subPages?.forEach((subPage) =>
+						updateWorkspaceType(subPage, newType),
+					);
 				};
-
 				updateWorkspaceType(workspaceToMove, toWorkspaceType);
 
-				const newWorkspaceState = {
-					...state.workspace,
-					[workspaceType]: sourceWorkspaces, // Use the modified source array
-					[toWorkspaceType]: state.workspace[toWorkspaceType]
-						? [...state.workspace[toWorkspaceType]]
-						: [],
-				};
+				// Ensure the destination workspace type exists
+				if (!newState.workspace[toWorkspaceType]) {
+					newState.workspace[toWorkspaceType] = [];
+				}
 
 				const newWorkspaceLocation = findToWorkspaceLocation(
-					newWorkspaceState[toWorkspaceType] || [],
+					newState.workspace[toWorkspaceType],
 					toWorkspaceId,
 				);
 
 				if (!newWorkspaceLocation) {
-					// If no destination workspace found, add to the top level of the destination type
-					newWorkspaceState[toWorkspaceType]?.push(workspaceToMove);
+					// If no destination workspace found, add to the top level
+					newState.workspace[toWorkspaceType].push(workspaceToMove);
 				} else {
+					// Add to the subPages of the destination workspace
 					newWorkspaceLocation.subPages = [
 						workspaceToMove,
 						...(newWorkspaceLocation.subPages || []),
 					];
 				}
 
-				return {
-					...state,
-					workspace: newWorkspaceState,
-				};
+				return newState;
 			}
-			return { ...state };
+
+			return state; // Return original state if no changes made
 		});
 	},
 
@@ -321,13 +392,14 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 			icon: "axon_logo.svg",
 			cover: "",
 			private: true,
+			workspaceWidth: "sm",
 			workspace: workspaceType,
 			coverPos: 50,
 			members: null,
 			parentPageId: null,
 			privileges: null,
 			createdBy: userId,
-			content: undefined,
+			content: null,
 			subPages: [],
 		};
 		if (workspaceType === "main") {
@@ -363,6 +435,22 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 		userId: string,
 		workspaceType: "main" | "axonverse",
 	) => {
+		const dummyWorkspace: IUserWorkspace = {
+			_id: uuidv4(),
+			title: "Untitled",
+			icon: null,
+			cover: undefined,
+			private: true,
+			coverPos: 50,
+			workspaceWidth: "sm",
+			workspace: workspaceType,
+			members: null,
+			createdBy: userId,
+			parentPageId: workspaceId,
+			privileges: null,
+			content: null,
+			subPages: [],
+		};
 		if (workspaceType === "main") {
 			set((state) => ({
 				workspace: {
@@ -373,25 +461,36 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 								userId,
 								workspaceId,
 								workspaceType,
+								dummyWorkspace,
 							)
 						: state.workspace.main,
 				},
 			}));
-		} else {
-			set((state) => ({
-				workspace: {
-					...state.workspace,
-					axonverse: state.workspace.axonverse
-						? addNewSubWorkspaceToParent(
-								state.workspace.axonverse,
-								userId,
-								workspaceId,
-								workspaceType,
-							)
-						: state.workspace.axonverse,
-				},
-			}));
+			return {
+				newWorkspaceId: dummyWorkspace._id,
+				newWorkspaceType: dummyWorkspace.workspace,
+				newWorkspaceParentPageId: dummyWorkspace.parentPageId,
+			};
 		}
+		set((state) => ({
+			workspace: {
+				...state.workspace,
+				axonverse: state.workspace.axonverse
+					? addNewSubWorkspaceToParent(
+							state.workspace.axonverse,
+							userId,
+							workspaceId,
+							workspaceType,
+							dummyWorkspace,
+						)
+					: state.workspace.axonverse,
+			},
+		}));
+		return {
+			newWorkspaceId: dummyWorkspace._id,
+			newWorkspaceType: dummyWorkspace.workspace,
+			newWorkspaceParentPageId: dummyWorkspace.parentPageId,
+		};
 	},
 
 	removeWorkspace: (
@@ -481,6 +580,36 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 								state.workspace.axonverse,
 								workspaceId,
 								workspaceCover,
+							)
+						: state.workspace.axonverse,
+				},
+			}));
+		}
+	},
+
+	updateWorkspaceIcon: (
+		workspaceId: string,
+		workspaceType: string,
+		icon: string | null,
+	) => {
+		if (workspaceType === "main") {
+			set((state) => ({
+				workspace: {
+					...state.workspace,
+					main: state.workspace.main
+						? updateWorkspaceIconById(state.workspace.main, workspaceId, icon)
+						: state.workspace.main,
+				},
+			}));
+		} else {
+			set((state) => ({
+				workspace: {
+					...state.workspace,
+					axonverse: state.workspace.axonverse
+						? updateWorkspaceIconById(
+								state.workspace.axonverse,
+								workspaceId,
+								icon,
 							)
 						: state.workspace.axonverse,
 				},
@@ -607,6 +736,34 @@ const updateWorkspaceCoverById = (
 	});
 };
 
+const updateWorkspaceIconById = (
+	workspaces: IUserWorkspace[],
+	workspaceId: string,
+	icon: string | null,
+): IUserWorkspace[] => {
+	return workspaces.map((workspace) => {
+		if (workspace._id === workspaceId) {
+			return {
+				...workspace,
+				icon,
+			};
+		}
+
+		if (workspace.subPages) {
+			return {
+				...workspace,
+				subPages: updateWorkspaceIconById(
+					workspace.subPages,
+					workspaceId,
+					icon,
+				),
+			};
+		}
+
+		return workspace;
+	});
+};
+
 const updateWorkspaceTitleById = (
 	workspaces: IUserWorkspace[],
 	workspaceId: string,
@@ -627,6 +784,33 @@ const updateWorkspaceTitleById = (
 					workspace.subPages,
 					workspaceId,
 					newTitle,
+				),
+			};
+		}
+		return workspace;
+	});
+};
+
+const updateWorkspaceWidthById = (
+	workspaces: IUserWorkspace[],
+	workspaceId: string,
+	workspaceWidth: "sm" | "lg",
+): IUserWorkspace[] => {
+	return workspaces.map((workspace) => {
+		if (workspace._id === workspaceId) {
+			return {
+				...workspace,
+				workspaceWidth,
+			};
+		}
+
+		if (workspace.subPages) {
+			return {
+				...workspace,
+				subPages: updateWorkspaceWidthById(
+					workspace.subPages,
+					workspaceId,
+					workspaceWidth,
 				),
 			};
 		}
@@ -664,28 +848,13 @@ const addNewSubWorkspaceToParent = (
 	userId: string,
 	workspaceId: string,
 	workspaceType: "main" | "axonverse",
+	dummyWorkspace: IUserWorkspace,
 ): IUserWorkspace[] => {
-	const newWorkspace: IUserWorkspace = {
-		_id: Math.random().toString(36).substring(2, 9),
-		title: "Untitled",
-		icon: "axon_logo.svg",
-		cover: undefined,
-		private: true,
-		coverPos: 50,
-		workspace: workspaceType,
-		members: null,
-		createdBy: userId,
-		parentPageId: workspaceId,
-		privileges: null,
-		content: undefined,
-		subPages: [],
-	};
-
 	return workspaces.map((workspace) => {
 		if (workspace._id === workspaceId) {
 			return {
 				...workspace,
-				subPages: [newWorkspace, ...workspace.subPages],
+				subPages: [dummyWorkspace, ...workspace.subPages],
 			};
 		}
 		if (workspace.subPages) {
@@ -696,6 +865,7 @@ const addNewSubWorkspaceToParent = (
 					userId,
 					workspaceId,
 					workspaceType,
+					dummyWorkspace,
 				),
 			};
 		}

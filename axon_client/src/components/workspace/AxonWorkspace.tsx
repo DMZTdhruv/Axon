@@ -9,6 +9,8 @@ import dynamic from "next/dynamic";
 import { useWorkspaceStore } from "@/stores/workspace";
 import Link from "next/link";
 import Image from "next/image";
+import { Skeleton } from "../ui/skeleton";
+import useGetWorkspaceContent from "@/hooks/workspace/useGetContent";
 // import Editor from "../Editor/axon_editor";
 
 const DynamicAxonEditor = dynamic(
@@ -16,7 +18,13 @@ const DynamicAxonEditor = dynamic(
 	{
 		ssr: false,
 		loading: () => (
-			<p className=" py-[20px] px-[50px] animate-pulse">Loading editor</p>
+			<p className=" py-[20px] max-w-5xl flex flex-col gap-4 mx-auto px-[50px] animate-pulse">
+				<Skeleton className="h-[20px] w-full bg-neutral-800" />
+				<Skeleton className="h-[20px] w-full bg-neutral-800" />
+				<Skeleton className="h-[20px] w-full bg-neutral-800" />
+				<Skeleton className="h-[20px] w-full bg-neutral-800" />
+				<Skeleton className="h-[20px] w-full bg-neutral-800" />
+			</p>
 		),
 	},
 );
@@ -35,6 +43,7 @@ const AxonWorkspace = ({
 	const traversePreviousNodes = (node: IRoutes, nodes: IRoutes[]) => {
 		const someList: IRoutes[] = [node, ...nodes];
 		folderRef.current = someList;
+
 		if (node.parentPageId === null) return;
 
 		const parentNode = findRoutes(node.parentPageId, workspaceType);
@@ -54,10 +63,28 @@ const AxonWorkspace = ({
 		traversePreviousNodes(demoObject, []);
 	}
 
+
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		setFolders(() => folderRef.current);
 	}, [workspaceStore.workspace]);
+
+	if (!workspaceStore.allWorkspacesFetched) {
+		return (
+			<div className="h-screen  w-full ">
+				<Skeleton className="bg-neutral-900 animate-pulse h-[248px] w-full" />
+				<div className=" py-[20px] w-full flex flex-col gap-4 mx-auto px-[50px] animate-pulse">
+					<Skeleton className="h-[20px] w-full bg-neutral-800" />
+					<Skeleton className="h-[20px] w-full bg-neutral-800" />
+					<Skeleton className="h-[20px] w-full bg-neutral-800" />
+					<Skeleton className="h-[20px] w-full bg-neutral-800" />
+					<Skeleton className="h-[20px] w-full bg-neutral-800" />
+					<Skeleton className="h-[20px] w-full bg-neutral-800" />
+					<Skeleton className="h-[20px] w-full bg-neutral-800" />
+				</div>
+			</div >
+		)
+	}
 
 	if (!currentWorkspace) {
 		return (
@@ -93,10 +120,12 @@ const AxonWorkspace = ({
 		<>
 			<WorkspaceTopBar currentWorkspace={currentWorkspace} folders={folders} />
 			<WorkspaceCover currentWorkspace={currentWorkspace} />
-			<DynamicAxonEditor
-				currentWorkspace={currentWorkspace}
-				workspaceId={currentWorkspace._id}
-			/>
+			<div className="min-h-[200vh]">
+				<DynamicAxonEditor
+					currentWorkspace={currentWorkspace}
+					workspaceId={currentWorkspace._id}
+				/>
+			</div>
 		</>
 	);
 };

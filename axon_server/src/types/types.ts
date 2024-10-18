@@ -12,10 +12,23 @@ export type TCreateWorkspaceControllerRequest = {
 	createdBy: string;
 };
 
+export type TCreateSubParentWorkspaceControllerRequest = {
+	_id: string;
+	workspace: "main" | "axonverse";
+	createdBy: string;
+};
+
 export type TCreateWorkspaceService = {
 	_id: string;
 	workspace: "main" | "axonverse";
 	createdBy: string;
+};
+
+export type TCreateSubWorkspaceService = {
+	_id: string;
+	workspace: "main" | "axonverse";
+	createdBy: string;
+	parentPageId: string;
 };
 export interface IUser extends Document {
 	username: string;
@@ -25,7 +38,7 @@ export interface IUser extends Document {
 	createdAt: Date;
 	updatedAt: Date;
 	workspaces: {
-		main: string[];
+		main: string[] | IWorkspace[];
 		axonverse: string[];
 	};
 	preferences: {
@@ -64,16 +77,17 @@ import type { Document } from "mongoose";
 export interface IWorkspace extends Document {
 	_id: string;
 	title?: string;
-	icon?: string;
+	icon: string | null;
 	cover?: string;
 	coverPos?: number;
 	workspace: "main" | "axonverse";
+	workspaceWidth: "sm" | "lg";
 	private: boolean;
 	parentPageId?: string | null;
 	childPageId?: string | null;
 	privileges: TPrivileges[];
-	subPages?: string[] | IWorkspace[];
-	contentId?: string;
+	subPages: string[] | IWorkspace[];
+	content: string | null;
 	createdBy: IUser;
 	createdAt: Date;
 	updatedAt: Date;

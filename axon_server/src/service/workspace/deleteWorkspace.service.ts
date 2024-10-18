@@ -3,12 +3,13 @@ import type { TAxonResponse } from "../../utils/axonResponse.js";
 import axonResponse from "../../utils/axonResponse.js";
 
 const workspaceRepo = new WorkspaceRepository();
+
 const deleteWorkspaceService = async (
 	userId: string,
 	workspaceId: string,
 ): Promise<TAxonResponse> => {
 	try {
-		const { isError, workspace } = await workspaceRepo.deleteWorkspaceById(
+		const { isError, workspace } = await workspaceRepo.deleteWorkspaces(
 			userId,
 			workspaceId,
 		);
@@ -16,14 +17,14 @@ const deleteWorkspaceService = async (
 		if (isError.error) {
 			return axonResponse(400, {
 				data: null,
-				success: false,
+				status: "error",
 				message: isError.errorMessage,
 			});
 		}
 
 		return axonResponse(200, {
 			data: workspace,
-			success: true,
+			status: "success",
 			message: "Workspace deleted successfully",
 		});
 	} catch (error) {

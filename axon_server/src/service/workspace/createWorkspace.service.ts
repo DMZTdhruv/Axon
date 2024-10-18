@@ -18,9 +18,9 @@ export const createWorkspaceService = async ({
 			workspace,
 			createdBy,
 		});
-		
+
 		console.log(newWorkspace);
-		
+
 		// pushing the workspaceId to the user main field in the user schema
 		const pushedMainWorkspace = await userRepo.pushWorkspaceToUser(
 			newWorkspace._id,
@@ -33,7 +33,7 @@ export const createWorkspaceService = async ({
 			return axonResponse(400, {
 				data: null,
 				message: pushedMainWorkspace.errorMessage,
-				success: false,
+				status: "error",
 			});
 		}
 
@@ -41,7 +41,7 @@ export const createWorkspaceService = async ({
 		return axonResponse(201, {
 			data: newWorkspace,
 			message: "workspace created successfully",
-			success: true,
+			status: "success",
 		});
 	} catch (error) {
 		if (error instanceof Error) {

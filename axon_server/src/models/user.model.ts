@@ -11,11 +11,13 @@ const userSchema = new Schema<IUser>(
 			main: [
 				{
 					type: String,
+					ref: "Workspace",
 				},
 			],
 			axonverse: [
 				{
 					type: String,
+					ref: "Workspace",
 				},
 			],
 		},

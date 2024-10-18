@@ -6,6 +6,14 @@ import { createParentWorkspaceController } from "../../controllers/workspace/cre
 import { getParentWorkspacesController } from "../../controllers/workspace/getParentWorkspaces.controller.js";
 import updateWorkspaceTitleController from "../../controllers/workspace/updateWorkspaceTitle.controller.js";
 import deleteWorkspaceController from "../../controllers/workspace/deleteWorkspace.controller.js";
+import updateWorkspaceCoverIconController, {
+	updateCoverYPositionController,
+	updateWorkspaceWidthController,
+} from "../../controllers/workspace/updateWorkspace.controllers.js";
+import updateWorkspaceContentController from "../../controllers/workspace/content/updateWorkspaceContent.controller.js";
+import getWorkspaceContentController from "../../controllers/workspace/content/getWorkspaceContent.controller.js";
+import { createSubParentWorkspaceController } from "../../controllers/workspace/createSubWorkspace.controller.js";
+import pushWorkspaceController from "../../controllers/workspace/pushWorkspaceController.js";
 const upload = multer({ dest: "uploads/" });
 const workspaceRouter = Router();
 
@@ -18,7 +26,7 @@ workspaceRouter.get(
 
 //handle post
 workspaceRouter.post(
-	"/create-parent-workspace",
+	"/new",
 	authenticateJsonWebToken,
 	createParentWorkspaceController,
 );
@@ -28,18 +36,62 @@ workspaceRouter.post(
 	deleteWorkspaceController,
 );
 workspaceRouter.post(
-	"/title/update",
+	"/title/transaction",
 	authenticateJsonWebToken,
 	updateWorkspaceTitleController,
+);
+workspaceRouter.post(
+	"/width/transaction",
+	authenticateJsonWebToken,
+	updateWorkspaceWidthController,
+);
+workspaceRouter.post(
+	"/push/transaction",
+	authenticateJsonWebToken,
+	pushWorkspaceController,
+);
+
+// workspace content
+//get
+workspaceRouter.get(
+	"/content",
+	authenticateJsonWebToken,
+	getWorkspaceContentController,
+);
+
+workspaceRouter.post(
+	"/icon/transaction",
+	authenticateJsonWebToken,
+	updateWorkspaceCoverIconController,
+);
+
+//post
+workspaceRouter.post(
+	"/content",
+	authenticateJsonWebToken,
+	updateWorkspaceContentController,
 );
 
 //handle Post
 // handle workspace image uploads
 workspaceRouter.post(
-	"/upload",
+	"/cover/upload/transaction",
 	authenticateJsonWebToken,
 	upload.single("image"),
 	uploadImageController,
+);
+
+workspaceRouter.post(
+	"/cover/yPos/transaction",
+	authenticateJsonWebToken,
+	updateCoverYPositionController,
+);
+
+// sub workspace routes
+workspaceRouter.post(
+	"/sub/new",
+	authenticateJsonWebToken,
+	createSubParentWorkspaceController,
 );
 
 export default workspaceRouter;

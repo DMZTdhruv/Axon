@@ -1,7 +1,15 @@
 {
    "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
    "linter": {
-      "enabled": true
+      "enabled": true,
+      "rules": {
+         "style": {
+            "useImportType": "off"
+         },
+         "suspicious": {
+            "noExplicitAny": "off"
+         }
+      }
    },
    "formatter": {
       "enabled": true,

@@ -24,7 +24,7 @@ const Navbar = () => {
 		<nav className="sticky z-[100] border-r-2 border-[#262626] flex-shrink-0 bg-customPrimary top-0 left-0 w-[250px]  h-screen max-h-svh py-[25px] px-[20px]">
 			<div className="flex flex-col gap-[25px] h-full">
 				<NavbarHeader />
-				<div className="flex flex-col gap-[12px]">
+				<div className="flex flex-col gap-[13px] ">
 					<Search />
 					{menuItems.map((menuLink) => {
 						return <NavLink key={menuLink.title} link={menuLink} />;

@@ -14,6 +14,10 @@ import { LuArrowLeftRight } from "react-icons/lu";
 import WorkspaceModalMoveToSectionFolder from "./WorkspaceModalMoveToSectionFolder";
 import useUpdateWorkspaceTitle from "@/hooks/workspace/useUpdateWorkspaceTitle";
 import useDeleteWorkspace from "@/hooks/workspace/useDeleteWorkspace";
+import { Switch } from "../ui/switch";
+import { SlNotebook } from "react-icons/sl";
+import useUpdateWorkspaceWIdth from "@/hooks/workspace/useUpdateWorkspaceWIdth";
+
 
 interface WorkspaceModalProps {
 	workspaceId: string;
@@ -29,9 +33,11 @@ interface INameState {
 
 const WorkspaceModal = ({ workspaceId, workspaceType, setModal, userId }: WorkspaceModalProps) => {
 	const workspace = useWorkspaceUtils();
-	const { updateWorkspaceTitleById, addNewSubWorkspaceById, removeWorkspace } = useWorkspaceStore();
+	const { updateWorkspaceWidth, updateWorkspaceTitleById, addNewSubWorkspaceById, removeWorkspace, updateSavingContent } = useWorkspaceStore();
 	const { updateWorkspaceTitle } = useUpdateWorkspaceTitle();
 	const { deleteWorkspaceById } = useDeleteWorkspace();
+	const { updateWorkspaceWidth: updateWorkspaceWidthOnServer } = useUpdateWorkspaceWIdth();
+
 	const currentWorkspace = workspace.findWorkspace(workspaceId, workspaceType);
 	const inputRef = useRef<HTMLInputElement | null>(null);
 	const [moveToHover, setMoveToHover] = useState<boolean>(false);
@@ -39,6 +45,7 @@ const WorkspaceModal = ({ workspaceId, workspaceType, setModal, userId }: Worksp
 		openSetNameModal: false,
 		nameOfBanner: currentWorkspace?.title as string,
 	});
+
 	useEffect(() => {
 		if (newName.openSetNameModal && inputRef.current) {
 			inputRef.current.focus();
@@ -48,6 +55,14 @@ const WorkspaceModal = ({ workspaceId, workspaceType, setModal, userId }: Worksp
 	if (!currentWorkspace) return null;
 
 	const handleUpdateRenameOfTitle = (userId: string, workspaceId: string) => {
+		if (
+			newName.nameOfBanner.trim().length === 0
+		) return
+		updateSavingContent({
+			workspaceId: currentWorkspace._id,
+			workspaceType: currentWorkspace.workspace,
+			savingStatus: true
+		});
 		updateWorkspaceTitleById(workspaceId, newName.nameOfBanner, workspaceType);
 		updateWorkspaceTitle({
 			userId,
@@ -57,11 +72,51 @@ const WorkspaceModal = ({ workspaceId, workspaceType, setModal, userId }: Worksp
 			workspaceType,
 			updateWorkspaceTitleById,
 		});
+		updateSavingContent({
+			workspaceId: currentWorkspace._id,
+			workspaceType: currentWorkspace.workspace,
+			savingStatus: false
+		});
 	};
+
 	const handleDeleteWorkspace = (workspaceId: string, workspaceType: "main" | "axonverse") => {
+		updateSavingContent({
+			workspaceId: currentWorkspace._id,
+			workspaceType: currentWorkspace.workspace,
+			savingStatus: true
+		});
 		removeWorkspace(workspaceId, workspaceType);
 		deleteWorkspaceById({ workspaceId, workspaceType });
+		updateSavingContent({
+			workspaceId: currentWorkspace._id,
+			workspaceType: currentWorkspace.workspace,
+			savingStatus: false
+		});
 	};
+
+
+	const handleUpdateWidth = () => {
+		updateSavingContent({
+			workspaceId: currentWorkspace._id,
+			workspaceType: currentWorkspace.workspace,
+			savingStatus: true
+		});
+		const oldWidth = currentWorkspace.workspaceWidth;
+		const updatedWidth = currentWorkspace.workspaceWidth === 'sm' ? 'lg' : 'sm';
+		updateWorkspaceWidth(currentWorkspace._id, workspaceType, updatedWidth)
+		updateWorkspaceWidthOnServer({
+			workspaceId,
+			workspaceType,
+			newWidth: updatedWidth,
+			oldWidth,
+			updateWorkspaceWidth,
+		})
+		updateSavingContent({
+			workspaceId: currentWorkspace._id,
+			workspaceType: currentWorkspace.workspace,
+			savingStatus: false
+		});
+	}
 
 	return (
 		<div className="absolute shadow-lg shadow-2xl  rounded-xl fade-in-0 border-neutral-800 border  top-0 left-[105%] z-[10] w-[250px] h-auto bg-neutral-950/50">
@@ -135,6 +190,20 @@ const WorkspaceModal = ({ workspaceId, workspaceType, setModal, userId }: Worksp
 						>
 							<IoAdd className="text-neutral-400 group-active:scale-90 " size={18} />
 							<span className="text-sm text-neutral-300">Add a new sub workspace</span>
+						</button>
+						<button
+							type="button"
+							className="p-2 h-[30px] text-neutral-300 rounded-lg text-[13px] hover:bg-neutral-800/50  w-full flex items-center justify-between transition-all"
+						>
+							<div className="gap-4 flex items-center">
+								<SlNotebook className="text-neutral-400" />
+								Note view
+							</div>
+							<Switch
+								onClick={handleUpdateWidth}
+								checked={currentWorkspace.workspaceWidth === 'sm'}
+								className="bg-neutral-700"
+							/>
 						</button>
 						{/* biome-ignore lint/a11y/useKeyWithMouseEvents: <explanation> */}
 						<div

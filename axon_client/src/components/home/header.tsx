@@ -15,9 +15,9 @@ const Header = () => {
 
 	return (
 		<section>
-			<div className="h-[289px] group transition-all relative w-full ">
+			<div className="h-[309px] group transition-all relative w-full ">
 				<div className=" fade-in-0 animate-in relative w-full h-full">
-					<div className="bg-gradient-to-b from-slate-50/0 via-[#0F0F0F]/60 to-[#0F0F0F] to-[83%] h-full w-full select-none absolute z-[5] top-0 left-0" />
+					<div className="bg-gradient-to-b from-slate-50/0 via-[#0F0F0F]/60 to-[#0F0F0F] to-[93%] h-full w-full select-none absolute z-[5] top-0 left-0" />
 
 					{!user.userCover ? (
 						<div className="h-full relative opacity-0 group-hover:opacity-100 transition-all  w-full">
@@ -42,7 +42,7 @@ const Header = () => {
 						/>
 					)}
 
-					<div className="absolute flex gap-2 items-end bottom-[30px] left-[40px] z-[10]">
+					<div className="absolute flex gap-2 items-end bottom-[10px] left-[40px] z-[10]">
 						{user.userIcon ? (
 							<Image
 								alt="workspace_icon"

@@ -13,6 +13,7 @@ export const uploadImageController = async (req: Request, res: Response) => {
 		const { workspaceId }: UploadImageBody = req.body;
 		const file = req.file as UploadedFile;
 		const user = req.user;
+
 		const validate = validateUploadImage(user, workspaceId, file);
 		if (validate.error) {
 			return res.status(400).json({ error: validate.errorMessage });
@@ -26,9 +27,12 @@ export const uploadImageController = async (req: Request, res: Response) => {
 
 		return res.status(statusCode).json(response);
 	} catch (error) {
-		if (error instanceof Error)
+		if (error instanceof Error) {
 			console.log(`Error in uploadImageController ${error.message}`);
+			return res.status(500).json({ error: "Internal server error." });
+		}
 
+		console.log(`Error in uploadImageController ${error}`);
 		return res.status(500).json({ error: "Internal server error." });
 	}
 };

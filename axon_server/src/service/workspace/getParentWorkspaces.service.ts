@@ -7,11 +7,12 @@ export const getParentWorkspacesService = async (
 	userId: string,
 ): Promise<TAxonResponse> => {
 	try {
-		const workspaces = await workspaceRepo.getWorkspacesByUserId(userId);
+		const workspaces = await workspaceRepo.fetchAllWorkspace(userId);
+		console.log(JSON.stringify(workspaces, null, 2));
 
-		if (workspaces.main.length === 0 && workspaces.axonverse.length === 0) {
+		if (workspaces?.main?.length === 0 && workspaces?.axonverse?.length === 0) {
 			return axonResponse(200, {
-				success: false,
+				status: "error",
 				message: "No workspaces found for this user",
 				data: workspaces,
 			});
@@ -20,7 +21,7 @@ export const getParentWorkspacesService = async (
 		return {
 			statusCode: 200,
 			response: {
-				success: true,
+				status: "success",
 				message: "workspace was successfully fetched",
 				data: workspaces,
 			},
@@ -28,7 +29,7 @@ export const getParentWorkspacesService = async (
 	} catch (error) {
 		console.error("Error in getParentWorkspacesService:", error);
 		return axonResponse(500, {
-			success: false,
+			status: "error",
 			message: "failed to get the workspace",
 			data: null,
 		});

@@ -1,0 +1,8 @@
+{
+	"dependencies": {
+		"@heroicons/react": "^2.1.5",
+		"@types/react-window": "^1.8.8",
+		"react-virtualized-auto-sizer": "^1.0.24",
+		"react-window": "^1.8.10"
+	}
+}

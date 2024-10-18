@@ -17,14 +17,14 @@ const updateWorkspaceTitleService = async (
 		if (updatedWorkspace.isError.error) {
 			return axonResponse(400, {
 				data: null,
-				success: false,
+				status: "error",
 				message: updatedWorkspace.isError.errorMessage,
 			});
 		}
 
 		return axonResponse(201, {
 			data: updatedWorkspace.workspace,
-			success: true,
+			status: "success",
 			message: "workspace title was updated successfully",
 		});
 	} catch (error) {

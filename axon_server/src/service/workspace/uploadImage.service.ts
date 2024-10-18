@@ -27,14 +27,14 @@ export const uploadImageService = async (
 		);
 		if (isError.error) {
 			return axonResponse(400, {
-				success: false,
+				status: "error",
 				message: "Image upload failed",
 				data: null,
 			});
 		}
 
 		return axonResponse(201, {
-			success: true,
+			status: "success",
 			message: "Image uploaded successfully",
 			data: {
 				imageId,
@@ -46,7 +46,7 @@ export const uploadImageService = async (
 			throw new Error(`Error in uploadImageService ${uploadImageService}`);
 		}
 		return axonResponse(401, {
-			success: false,
+			status: "error",
 			message: "Image upload failed.",
 			data: null,
 		});

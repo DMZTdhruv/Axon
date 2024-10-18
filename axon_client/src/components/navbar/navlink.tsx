@@ -12,7 +12,7 @@ const NavLink = ({ link }: { link: TMenuItem }) => {
 		<Link
 			href={`/${link.url}`}
 			key={link.title}
-			className={`flex w-fit text-[13px] ${isActive ? "opacity-100" : "opacity-60 "} hover:opacity-100 transition-all  gap-[10px]`}
+			className={`flex w-fit ${isActive ? "opacity-100" : "opacity-60 "} hover:opacity-100  transition-all  gap-[10px]`}
 		>
 			<img
 				width={17}
@@ -20,7 +20,7 @@ const NavLink = ({ link }: { link: TMenuItem }) => {
 				src={`/assets/${link.icon}`}
 				alt={`icon_${link.title}`}
 			/>
-			<span className="text-[14px]">{link.title}</span>
+			<span className="text-[13px] ">{link.title}</span>
 		</Link>
 	);
 };

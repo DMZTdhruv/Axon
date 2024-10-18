@@ -1,7 +1,8 @@
 {
-	"cSpell.words": [
-		"Axonverse",
-		"Dhruv",
-		"uuidv"
-	]
+   "editor.defaultFormatter": "biomejs.biome",
+   "notebook.defaultFormatter": "biomejs.biome",
+   "cSpell.words": [
+      "Lowlight",
+      "tiptap"
+   ]
 }

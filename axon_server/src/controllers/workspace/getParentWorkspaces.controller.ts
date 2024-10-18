@@ -1,8 +1,12 @@
 import type { Request, Response } from "express";
 import getParentWorkspacesService from "../../service/workspace/getParentWorkspaces.service.js";
 import { validateGetParentWorkspacesController } from "../../validators/workspace.validator.js";
+import { internalServerErrorResponse } from "../../constant.js";
 
-export const getParentWorkspacesController = async (req: Request, res: Response) => {
+export const getParentWorkspacesController = async (
+	req: Request,
+	res: Response,
+) => {
 	try {
 		const user = req.user;
 		// reason: In case in future if we need to validate more data.
@@ -15,7 +19,9 @@ export const getParentWorkspacesController = async (req: Request, res: Response)
 	} catch (error) {
 		if (error instanceof Error) {
 			console.log(`Error in getParentWorkspaceController: ${error.message}`);
+			return res.status(500).json(internalServerErrorResponse);
 		}
-		return res.status(500).json({ error: "Internal server error" });
+		console.log(`Error in getParentWorkspaceController: ${error}`);
+		return res.status(500).json(internalServerErrorResponse);
 	}
 };

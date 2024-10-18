@@ -1,6 +1,6 @@
 export type TResponse = {
 	message: string;
-	success: boolean;
+	status: "success" | "error";
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	data: any;
 };
@@ -10,7 +10,10 @@ export type TAxonResponse = {
 	response: TResponse;
 };
 
-const axonResponse = (statusCode: number, response: TResponse): TAxonResponse => {
+const axonResponse = (
+	statusCode: number,
+	response: TResponse,
+): TAxonResponse => {
 	return {
 		statusCode,
 		response,

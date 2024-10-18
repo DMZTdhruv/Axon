@@ -17,6 +17,8 @@ import type { Editor } from "@tiptap/core";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
+
+
 export type SelectorItem = {
   name: string;
   icon: LucideIcon;
@@ -78,8 +80,8 @@ const items: SelectorItem[] = [
   {
     name: "Code",
     icon: Code,
-    command: (editor) => editor.chain().focus().toggleCodeBlock().run(),
-    isActive: (editor) => editor.isActive("codeBlock"),
+    command: (editor) => editor.chain().focus().toggleCode().run(),
+    isActive: (editor) => editor.isActive("code"),
   },
 ];
 interface NodeSelectorProps {

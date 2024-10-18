@@ -2,40 +2,74 @@
 
 import { useWorkspaceStore, type IUserWorkspace } from "@/stores/workspace";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { BsThreeDots } from "react-icons/bs";
 import { IoIosArrowForward } from "react-icons/io";
 import WorkspaceModal from "./workspaceModal";
 import { IoIosAdd } from "react-icons/io";
 import { useAuthStore } from "@/stores/auth";
+import useCreateNewSubParentWorkspace from "@/hooks/workspace/useCreateParentSubWorkspace";
+import dynamic from "next/dynamic";
+const DynamicIcon = dynamic(() => import("../ui/DynamicIcon"), {
+	ssr: false,
+});
 
 const Workspace = ({ workspaceLink }: { workspaceLink: IUserWorkspace }) => {
 	const [openFolder, setOpenFolder] = useState<boolean>(false);
 	const path = usePathname();
 	const isActive = path.includes(workspaceLink._id);
 	const [openModal, setOpenModal] = useState<boolean>(false);
-	const { addNewSubWorkspaceById, addNewRecentWorkspace } = useWorkspaceStore();
-
+	const { addNewSubWorkspaceById, addNewRecentWorkspace, removeWorkspace } =
+		useWorkspaceStore();
+	const { createSubParentWorkspace } = useCreateNewSubParentWorkspace();
+	const router = useRouter();
 	const { user } = useAuthStore();
+
+	const addNewSubWorkspace = () => {
+		if (!user?._id) return;
+		const { newWorkspaceId, newWorkspaceType, newWorkspaceParentPageId } =
+			addNewSubWorkspaceById(
+				workspaceLink._id,
+				user._id,
+				workspaceLink.workspace,
+			);
+
+		if (newWorkspaceParentPageId) {
+			createSubParentWorkspace({
+				_id: newWorkspaceId,
+				parentPageId: newWorkspaceParentPageId,
+				workspace: newWorkspaceType,
+				createdBy: user._id,
+				removeWorkspace,
+			});
+		}
+
+		router.push(`/workspace/${newWorkspaceType}/${newWorkspaceId}`);
+	};
 
 	return (
 		<div
 			key={workspaceLink._id}
-			className="flex animate-in fade-in-0  relative z-[10] flex-col gap-[15px]"
+			className="flex animate-in rounded-[8px] fade-in-0 justify-center relative z-[10] flex-col gap-[15px]"
 		>
-			{/* <div className="absolute top-[-5px] left-[-5px] rounded-lg bg-[#262626] w-full p-2 h-[29px]" /> */}
 			<div
 				className={` flex select-none group cursor-pointer items-center justify-between text-[13px] ${isActive ? "opacity-100" : "opacity-60"} hover:opacity-100 transition-all  gap-[10px]`}
 			>
 				<div className="flex items-center gap-[10px]">
 					<div className="relative hover:bg-neutral-900  transition-all rounded-md w-[17px] h-[17px]">
-						<img
+						{/* <img
 							width={17}
 							height={17}
 							className="absolute opacity-100 group-hover:opacity-0 transition-all top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
 							src={`/assets/${workspaceLink.icon}`}
 							alt={`icon_${workspaceLink.title}`}
+						/> */}
+						<DynamicIcon
+							name={workspaceLink.icon}
+							height={17}
+							width={17}
+							DClassName="absolute opacity-100 group-hover:opacity-0 transition-all top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
 						/>
 						{/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
 						<div
@@ -49,7 +83,7 @@ const Workspace = ({ workspaceLink }: { workspaceLink: IUserWorkspace }) => {
 					</div>
 					<Link
 						href={`/workspace/${workspaceLink.workspace}/${workspaceLink._id}`}
-						className="hover:underline"
+						className="hover:underline leading-[0%]"
 						onClick={() => {
 							addNewRecentWorkspace(
 								workspaceLink._id,
@@ -71,15 +105,7 @@ const Workspace = ({ workspaceLink }: { workspaceLink: IUserWorkspace }) => {
 					<button
 						type="button"
 						className="opacity-0 relative active:scale-90 group-hover:opacity-100  hover:bg-neutral-900 p-[3px]  rounded-md"
-						onClick={() => {
-							if (user?._id) {
-								addNewSubWorkspaceById(
-									workspaceLink._id,
-									user._id,
-									workspaceLink.workspace,
-								);
-							}
-						}}
+						onClick={addNewSubWorkspace}
 					>
 						<IoIosAdd />
 					</button>
@@ -99,7 +125,7 @@ const Workspace = ({ workspaceLink }: { workspaceLink: IUserWorkspace }) => {
 			{openFolder &&
 				(workspaceLink?.subPages && workspaceLink?.subPages?.length !== 0 ? (
 					openFolder && (
-						<div className="flex   border-l-2 pl-3 border-neutral-800 flex-col gap-[15px]">
+						<div className="flex ml-2 border-l-2 pl-2 border-neutral-800 flex-col gap-[15px]">
 							{workspaceLink?.subPages?.map((subPage) => {
 								return (
 									<WorkspaceFolder key={subPage._id} workspaceLink={subPage} />
@@ -120,27 +146,51 @@ const WorkspaceFolder = ({
 	workspaceLink,
 }: { workspaceLink: IUserWorkspace }) => {
 	const [openFolder, setOpenFolder] = useState<boolean>(false);
+	const { createSubParentWorkspace } = useCreateNewSubParentWorkspace();
 	const path = usePathname();
 	const isActive = path.includes(workspaceLink._id);
 	console.log(workspaceLink._id);
 	const [openModal, setOpenModal] = useState<boolean>(false);
-	const { addNewSubWorkspaceById, addNewRecentWorkspace } = useWorkspaceStore();
-
+	const { addNewSubWorkspaceById, addNewRecentWorkspace, removeWorkspace } =
+		useWorkspaceStore();
+	const router = useRouter();
 	const { user } = useAuthStore();
+
+	const addNewSubWorkspace = () => {
+		if (!user?._id) return;
+		const { newWorkspaceId, newWorkspaceType, newWorkspaceParentPageId } =
+			addNewSubWorkspaceById(
+				workspaceLink._id,
+				user._id,
+				workspaceLink.workspace,
+			);
+
+		if (newWorkspaceParentPageId) {
+			createSubParentWorkspace({
+				_id: newWorkspaceId,
+				parentPageId: newWorkspaceParentPageId,
+				workspace: newWorkspaceType,
+				createdBy: user._id,
+				removeWorkspace,
+			});
+		}
+
+		router.push(`/workspace/${newWorkspaceType}/${newWorkspaceId}`);
+	};
+
 	return (
-		<div className="flex flex-col   gap-[15px]">
+		<div className="flex flex-col  fade-in-0 animate-in gap-[15px]">
 			<div
 				key={workspaceLink.title}
 				className={`flex group cursor-pointer items-center justify-between text-[13px] ${isActive ? "opacity-100" : "opacity-60"} hover:opacity-100 transition-all  gap-[10px]`}
 			>
 				<div className="flex flex-shrink-0 items-center gap-[10px]">
 					<div className="relative w-[17px] h-[17px]">
-						<img
-							width={17}
+						<DynamicIcon
+							name={workspaceLink.icon}
 							height={17}
-							className="absolute opacity-100 group-hover:opacity-0 transition-all top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
-							src={`/assets/${workspaceLink.icon}`}
-							alt={`icon_${workspaceLink.title}`}
+							width={17}
+							DClassName="absolute opacity-100 group-hover:opacity-0 transition-all top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
 						/>
 						{/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
 						<div
@@ -173,15 +223,7 @@ const WorkspaceFolder = ({
 					<button
 						type="button"
 						className="opacity-0 relative active:scale-90 group-hover:opacity-100  hover:bg-neutral-900 p-[3px]  rounded-md"
-						onClick={() => {
-							if (user?._id) {
-								addNewSubWorkspaceById(
-									workspaceLink._id,
-									user._id,
-									workspaceLink.workspace,
-								);
-							}
-						}}
+						onClick={addNewSubWorkspace}
 					>
 						<IoIosAdd />
 					</button>
@@ -199,7 +241,7 @@ const WorkspaceFolder = ({
 				/>
 			)}
 			{openFolder && (
-				<div className="flex border-l-2 border-neutral-800 pl-3 gap-[15px] flex-col ">
+				<div className="flex border-l-2 ml-2 border-neutral-800 pl-2 gap-[15px] flex-col ">
 					{workspaceLink?.subPages && workspaceLink?.subPages?.length !== 0 ? (
 						workspaceLink?.subPages?.map((folderName) => {
 							return (

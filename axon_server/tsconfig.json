@@ -1,8 +1,10 @@
 {
 	"compilerOptions": {
-		"target": "ESNext", // Target modern ECMAScript version
+		"target": "ES2020", // Target modern ECMAScript version
 		"module": "ESNext", // Use CommonJS module system for Node.js
-		"lib": ["ES2020"], // Include ECMAScript 2020 library for built-in APIs
+		"lib": [
+			"ES2020"
+		], // Include ECMAScript 2020 library for built-in APIs
 		"strict": true, // Enable all strict type-checking options
 		"esModuleInterop": true, // Enables compatibility with ES module imports
 		"skipLibCheck": true, // Skip type checking of declaration files
@@ -17,9 +19,16 @@
 		"noImplicitReturns": true, // Ensure all functions return a value
 		"noUnusedLocals": true, // Report errors on unused local variables
 		"noUnusedParameters": true, // Report errors on unused parameters
-		"noFallthroughCasesInSwitch": true,// Ensure all switch statements have a return for each case
-		"typeRoots": ["./node_modules/@types", "./src/types"]
+		"noFallthroughCasesInSwitch": true, // Ensure all switch statements have a return for each case
+		"typeRoots": [
+			"./node_modules/@types",
+			"./src/types"
+		]
 	},
-	"include": ["src/**/*.ts"], // Include all TypeScript files in the src directory
-	"exclude": ["node_modules"] // Exclude node_modules from compilation
+	"include": [
+		"src/**/*.ts"
+	], // Include all TypeScript files in the src directory
+	"exclude": [
+		"node_modules"
+	] // Exclude node_modules from compilation
 }

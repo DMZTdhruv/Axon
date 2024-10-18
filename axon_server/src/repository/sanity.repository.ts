@@ -41,4 +41,22 @@ export class SanityRepository {
 			imageFile.destroy();
 		}
 	}
+	async deleteImages(workspaceId: string): Promise<void> {
+		try {
+			const query = `*[_type == "imageSchema" && workspaceId == $workspaceId]`;
+			const imageDocs = await client.fetch(query, { workspaceId });
+			
+			for (const imageDoc of imageDocs) {
+				await client.delete(imageDoc._id);
+				console.log(`deleted images for ${imageDoc._id}`);
+			}
+		} catch (error) {
+			if (error instanceof Error) {
+				throw new Error(
+					`🔴 Error occurred in deleteImages - SanityRepository: ${error.message}`,
+				);
+			}
+			throw new Error("An unknown error occurred in deleteImages");
+		}
+	}
 }

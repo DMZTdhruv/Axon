@@ -1,14 +1,19 @@
 .ProseMirror > * {
-	color: white;
+	color: rgb(235, 235, 235);
+	font-weight: 400;
 	@apply my-2 leading-snug;
 }
 
+.prose {
+	@apply text-base
+}
+
 .ProseMirror {
+	/* biome-ignore lint/correctness/noUnknownFunction: <explanation> */
 	--tw-prose-bold: theme("colors.white");
 }
 
 .ProseMirror .is-editor-empty:first-child::before {
-	content: "Start typing or press '/' for commands";
 	float: left;
 	color: hsl(var(--muted-foreground));
 	pointer-events: none;
@@ -36,6 +41,16 @@
 		outline: 3px solid #5abbf7;
 		filter: brightness(90%);
 	}
+}
+
+.ProseMirror h2 {
+	font-weight: 800;
+}
+.ProseMirror h3 {
+	font-weight: 600;
+}
+.ProseMirror h1 {
+	font-weight: 800;
 }
 
 .img-placeholder {
@@ -67,6 +82,7 @@
 ul[data-type="taskList"] li > label {
 	margin-right: 0.2rem;
 	user-select: none;
+	color: white;
 }
 
 @media screen and (max-width: 768px) {
@@ -74,6 +90,8 @@ ul[data-type="taskList"] li > label {
 		margin-right: 0.5rem;
 	}
 }
+
+
 
 ul[data-type="taskList"] li > label input[type="checkbox"] {
 	-webkit-appearance: none;
@@ -123,14 +141,13 @@ ul[data-type="taskList"] li[data-checked="true"] > div > p {
 }
 
 /* Overwrite tippy-box original max-width */
-
 .tippy-box {
 	max-width: 400px !important;
 }
 
 .ProseMirror:not(.dragging) .ProseMirror-selectednode {
 	outline: none !important;
-	background-color: var(--novel-highlight-blue);
+	background-color: rgb(26, 26, 26);
 	transition: background-color 0.2s;
 	box-shadow: none;
 }
@@ -150,12 +167,12 @@ ul[data-type="taskList"] li[data-checked="true"] > div > p {
 	cursor: grab;
 
 	&:hover {
-		background-color: var(--novel-stone-100);
+		background-color: #191919;
 		transition: background-color 0.2s;
 	}
 
 	&:active {
-		background-color: var(--novel-stone-200);
+		background-color: #272727;
 		transition: background-color 0.2s;
 		cursor: grabbing;
 	}
@@ -209,10 +226,10 @@ div[data-youtube-video] > iframe {
 }
 
 /* CSS for bold coloring and highlighting issue*/
-span[style] > strong {
+/* span[style] > strong {
 	color: inherit;
 }
 
 mark[style] > strong {
 	color: inherit;
-}
+} */

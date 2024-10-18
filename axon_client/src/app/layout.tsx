@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Lato } from "next/font/google";
 import "./globals.css";
+import { Open_Sans } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"] });
-const lato = Lato({
+const open_Sans = Open_Sans({
+	weight: ["300", "400", "500", "600", "700"],
 	subsets: ["latin"],
-	weight: ["100", "300", "400", "700", "900"],
+	display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body className={`${inter.className} text-white bg-customMain flex`}>
+			<body className={`${open_Sans.className} text-white bg-customMain flex`}>
 				{children}
 			</body>
 		</html>

@@ -5,6 +5,7 @@ interface JWTUser {
 	username: string;
 }
 
+// generating jwt token
 export const generateJsonWebToken = (userData: JWTUser) => {
 	const secretKey = process.env.SECRET_KEY;
 	if (!secretKey) {

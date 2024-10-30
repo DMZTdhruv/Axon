@@ -1,7 +1,13 @@
 import type { Request, Response } from "express";
-import { uploadImageService } from "../../service/workspace/uploadImage.service.js";
+import {
+	removeImageService,
+	uploadImageService,
+} from "../../service/workspace/uploadImage.service.js";
 import type { UploadedFile } from "../../types/types.js";
-import { validateUploadImage } from "../../validators/workspace.validator.js";
+import {
+	validateCommonValues,
+	validateUploadImage,
+} from "../../validators/workspace.validator.js";
 
 type UploadImageBody = {
 	workspaceId: string;
@@ -33,6 +39,39 @@ export const uploadImageController = async (req: Request, res: Response) => {
 		}
 
 		console.log(`Error in uploadImageController ${error}`);
+		return res.status(500).json({ error: "Internal server error." });
+	}
+};
+
+// Todo list
+/*
+[] - remove the image and also delete from the sanity
+[] - Check if the user has made the blog if yes don't let him make another, validate the blog data, and also make the get blog data endpoint, with the icon, tile and cover from the workspace   
+*/
+
+export const removeImageController = async (req: Request, res: Response) => {
+	try {
+		const { workspaceId } = req.body;
+		const user = req.user;
+
+		const validate = validateCommonValues(user._id, workspaceId);
+		if (validate.error) {
+			return res.status(400).json({ error: validate.errorMessage });
+		}
+
+		const { statusCode, response } = await removeImageService(
+			user._id,
+			workspaceId,
+		);
+
+		return res.status(statusCode).json(response);
+	} catch (error) {
+		if (error instanceof Error) {
+			console.log(`Error in remove image controller ${error.message}`);
+			return res.status(500).json({ error: "Internal server error." });
+		}
+
+		console.log(`Error in remove image controller ${error}`);
 		return res.status(500).json({ error: "Internal server error." });
 	}
 };

@@ -41,9 +41,17 @@ export interface IUser extends Document {
 		main: string[] | IWorkspace[];
 		axonverse: string[];
 	};
+	blogs: [];
 	preferences: {
 		theme: string;
 	};
+}
+
+export interface IBlog extends Document {
+	createdBy: IUser | string;
+	workspaceId: IWorkspace | string;
+	content: mongoose.Schema.Types.ObjectId | null | IContent;
+	blogId: string;
 }
 
 export type TValidateResponse = {
@@ -74,6 +82,7 @@ export type TPrivileges = {
 };
 
 import type { Document } from "mongoose";
+import mongoose from "mongoose";
 export interface IWorkspace extends Document {
 	_id: string;
 	title?: string;
@@ -89,6 +98,7 @@ export interface IWorkspace extends Document {
 	subPages: string[] | IWorkspace[];
 	content: string | null;
 	createdBy: IUser;
+	blogId: mongoose.Schema.Types.ObjectId | null;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -101,3 +111,19 @@ export interface IContent extends Document {
 	createdAt: Date;
 	updatedAt: Date;
 }
+
+export interface IBlogContent extends Document {
+	// biome-ignore lint/complexity/noBannedTypes: <explanation>
+	content: Object;
+	workspaceId: mongoose.Schema.Types.ObjectId;
+	createdBy: IUser;
+	createdAt: Date;
+	updatedAt: Date;
+	blogId: mongoose.Schema.Types.ObjectId;
+}
+
+// blogs
+export type CommonBlogParams = {
+	userId: string;
+	workspaceId: string;
+};

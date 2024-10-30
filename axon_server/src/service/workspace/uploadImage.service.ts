@@ -6,6 +6,7 @@ import axonResponse from "../../utils/axonResponse.js";
 
 const sanityRepo = new SanityRepository();
 const workspaceRepo = new WorkspaceRepository();
+
 export const uploadImageService = async (
 	userId: string,
 	workspaceId: string,
@@ -50,5 +51,35 @@ export const uploadImageService = async (
 			message: "Image upload failed.",
 			data: null,
 		});
+	}
+};
+
+export const removeImageService = async (
+	userId: string,
+	workspaceId: string,
+) => {
+	try {
+		const { isError, workspace } = await workspaceRepo.removeCover(
+			userId,
+			workspaceId,
+		);
+		if (isError.error) {
+			return axonResponse(400, {
+				status: "error",
+				message: "removing cover failed.",
+				data: null,
+			});
+		}
+
+		return axonResponse(201, {
+			status: "success",
+			message: "cover removed successfully.",
+			data: workspace,
+		});
+	} catch (error) {
+		if (error instanceof Error) {
+			throw new Error(`Error in remove image service ${uploadImageService}`);
+		}
+		throw error;
 	}
 };

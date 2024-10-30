@@ -616,6 +616,37 @@ export class WorkspaceRepository {
 		};
 	}
 
+	async removeCover(
+		userId: string,
+		workspaceId: string,
+	): Promise<CommonWorkspaceReturn> {
+		const workspace = await Workspace.findById(workspaceId);
+		if (!workspace) {
+			return {
+				isError: errorMessage(true, "Workspace not found"),
+				workspace: null,
+			};
+		}
+
+		const isUserPrivileged = checkIfUserIsPrivileged(
+			workspace.privileges,
+			userId,
+		);
+
+		if (isUserPrivileged.error) {
+			return {
+				isError: errorMessage(true, isUserPrivileged.errorMessage),
+				workspace: null,
+			};
+		}
+
+		await sanityRepo.deleteImages(workspaceId);
+		return {
+			isError: errorMessage(false, ""),
+			workspace: null,
+		};
+	}
+
 	async updateWorkspaceContent(
 		workspaceId: string,
 		// biome-ignore lint/complexity/noBannedTypes: <explanation>

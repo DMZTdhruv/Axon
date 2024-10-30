@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { uploadImageController } from "../../controllers/workspace/uploadImage.controller.js";
+import {
+	removeImageController,
+	uploadImageController,
+} from "../../controllers/workspace/uploadImage.controller.js";
 import authenticateJsonWebToken from "../../middleware/auth.middleware.js";
 import multer from "multer";
 import { createParentWorkspaceController } from "../../controllers/workspace/createParentWorkspace.controller.js";
@@ -85,6 +88,12 @@ workspaceRouter.post(
 	"/cover/yPos/transaction",
 	authenticateJsonWebToken,
 	updateCoverYPositionController,
+);
+
+workspaceRouter.post(
+	"/cover/remove",
+	authenticateJsonWebToken,
+	removeImageController,
 );
 
 // sub workspace routes

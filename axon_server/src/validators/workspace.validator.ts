@@ -6,6 +6,12 @@ const INCOMPLETE_DATA = "Incomplete data was provided";
 const INVALID_DATA = "Invalid data was provided";
 
 interface UploadedFile extends Express.Multer.File {}
+
+/*
+	THESE ARE ALL THE VALIDATORS FOR [WORKSPACE], KINDLY GO THROUGH THEM, THE SYNTAX IS CLEAR AND EASY TO UNDERSTAND
+*/
+
+
 export const validateUploadImage = (
 	user: IJwtUser,
 	workspaceId: string,
@@ -28,6 +34,13 @@ export const validateUploadImage = (
 	const maxFileSize = 5 * 1024 * 1024;
 	if (size > maxFileSize) return errorMessage(true, "image is too big.");
 
+	return errorMessage(false, "");
+};
+
+export const validateCommonValues = (userId: string, workspaceId: string) => {
+	if (!userId || !workspaceId) {
+		return errorMessage(true, INCOMPLETE_DATA);
+	}
 	return errorMessage(false, "");
 };
 

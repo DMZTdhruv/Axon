@@ -1,6 +1,7 @@
 import { ErrorMessageReturn, TPrivileges } from "../types/types";
 import { errorMessage } from "../validators/errorResponse.js";
 
+// function to check if the user is privileged to update the workspace or not
 export function checkIfUserIsPrivileged(
 	users: TPrivileges[] | undefined,
 	userId: string,

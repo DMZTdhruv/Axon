@@ -1,6 +1,10 @@
 import bcrypt from "bcryptjs";
 
-export const hashPassword = async (password :string): Promise<string> => {
+/*
+	FUNCTIONS TO HASH THE PASSWORD AND CHECK THE HASHED PASSWORD
+*/
+
+export const hashPassword = async (password: string): Promise<string> => {
 	try {
 		const salt = await bcrypt.genSalt(10);
 		const hashedPassword = await bcrypt.hash(password, salt);
@@ -10,11 +14,16 @@ export const hashPassword = async (password :string): Promise<string> => {
 	}
 };
 
-export const checkHashPassword = async (password: string, hashPassword: string): Promise<boolean> => {
+export const checkHashPassword = async (
+	password: string,
+	hashPassword: string,
+): Promise<boolean> => {
 	try {
-		console.log({userPassword: password, hashedPassword: hashPassword})
-		return await bcrypt.compare(password,hashPassword);
+		console.log({ userPassword: password, hashedPassword: hashPassword });
+		return await bcrypt.compare(password, hashPassword);
 	} catch (error) {
-		throw new Error("Error matching the hash password with the un-hashed password");
+		throw new Error(
+			"Error matching the hash password with the un-hashed password",
+		);
 	}
-}
+};

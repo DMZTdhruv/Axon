@@ -1,7 +1,6 @@
 export type TResponse = {
 	message: string;
 	status: "success" | "error";
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	data: any;
 };
 

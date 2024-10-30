@@ -38,6 +38,7 @@ const workspaceSchema = new mongoose.Schema<IWorkspace>(
 			ref: "WorkspaceContent",
 			default: null,
 		},
+		blogId: { type: mongoose.Types.ObjectId, ref: "Blog", default: null },
 		createdBy: { type: mongoose.Types.ObjectId, ref: "User", required: true },
 	},
 	{

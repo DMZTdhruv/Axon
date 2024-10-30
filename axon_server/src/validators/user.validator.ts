@@ -2,6 +2,10 @@ import type { TValidateResponse } from "../types/types.js";
 import type { TUser } from "../types/types.js";
 import { errorMessage } from "./errorResponse.js";
 
+/*
+	THESE ARE ALL THE VALIDATORS FOR [USER], KINDLY GO THROUGH THEM, THE SYNTAX IS CLEAR AND EASY TO UNDERSTAND
+*/
+
 const validateEmail = (email: string): boolean => {
 	const emailRegex = /[a-zA-Z]+([-+.'][a-zA-Z]+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
 	return emailRegex.test(email);

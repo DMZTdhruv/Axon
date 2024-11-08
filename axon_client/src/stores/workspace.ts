@@ -3,13 +3,9 @@ import type { JSONContent } from "novel";
 import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
 
-type TNavigationWorkspace = {
-	_id: string;
-	title: string;
-	icon: string;
-	cover: string;
-	workspace: "axon" | "axonverse";
-};
+/**
+ * Core types for workspace management and user privileges
+ **/
 
 type TPrivileges = {
 	_id: string;
@@ -24,7 +20,6 @@ type TCreatedBy = TAuthUser & {
 export type TContent = {
 	_id: string;
 	block: string;
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	blockContent: any;
 	bold: boolean;
 	italic: boolean;
@@ -46,6 +41,7 @@ export interface IUserWorkspace {
 	parentPageId: string | null;
 	privileges: TPrivileges | null;
 	subPages: IUserWorkspace[];
+	blogId: string | null;
 	createdBy: string;
 	content: JSONContent | null;
 }
@@ -57,19 +53,13 @@ export interface WorkspaceStore {
 	};
 }
 
-type SavingContentParams = {
-	workspaceId: string;
-	workspaceType: "axonverse" | "main";
-	savingStatus: boolean;
-};
-
 type SavingContent = {
 	workspaceId: string | null;
 	workspaceType: "axonverse" | "main" | null;
 	savingStatus: boolean;
 };
 
-interface IUserWorkspaceStore {
+export interface IUserWorkspaceStore {
 	workspace: {
 		main: IUserWorkspace[] | null;
 		axonverse: IUserWorkspace[] | null;
@@ -77,12 +67,14 @@ interface IUserWorkspaceStore {
 	};
 
 	// Loading states
+	navOpen: boolean;
 	savingContent: SavingContent;
 	allWorkspacesFetched: boolean;
 
 	// update boolean state
 	updateSavingContent: (savingParams: SavingContent) => void;
 	handleAllWorkspacesLoaded: (value: boolean) => void;
+
 	// Workspace management
 	addMainWorkspaces: (mainWorkspaces: IUserWorkspace[]) => void;
 	addAxonverseWorkspaces: (mainWorkspaces: IUserWorkspace[]) => void;
@@ -117,6 +109,12 @@ interface IUserWorkspaceStore {
 		workspaceType: "main" | "axonverse",
 	) => void;
 
+	blogIdOperation: (
+		workspaceId: string,
+		blogID: string,
+		workspaceType: "main" | "axonverse",
+		operation: "add" | "remove",
+	) => void;
 	// Workspace updates
 	updateWorkspaceTitleById: (
 		workspaceId: string,
@@ -132,6 +130,10 @@ interface IUserWorkspaceStore {
 		workspaceId: string,
 		workspaceType: "main" | "axonverse",
 		workspaceCover: string,
+	) => void;
+	removeWorkspaceCover: (
+		workspaceId: string,
+		workspaceType: "main" | "axonverse",
 	) => void;
 	updateWorkspaceWidth: (
 		workspaceId: string,
@@ -151,7 +153,15 @@ interface IUserWorkspaceStore {
 		workspaceType: "main" | "axonverse",
 		toWorkspaceType: "main" | "axonverse",
 	) => void;
+
+	//navbar
+	openNavHandler: () => void;
 }
+
+/**
+ * Main Zustand store implementation for workspace management
+ * Handles state updates and complex workspace operations
+ **/
 
 export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 	workspace: {
@@ -159,12 +169,34 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 		axonverse: [],
 		recent: [],
 	},
+	navOpen: true,
 	allWorkspacesFetched: false,
 	savingContent: {
 		workspaceId: null,
 		savingStatus: false,
 		workspaceType: null,
 	},
+	openNavHandler: () => {
+		set((state) => ({
+			...state,
+			navOpen: !state.navOpen,
+		}));
+	},
+
+	removeWorkspaceCover: (
+		workspaceId: string,
+		workspaceType: "axonverse" | "main",
+	) => {
+		set((state) => ({
+			workspace: {
+				...state.workspace,
+				[workspaceType]: state.workspace.main
+					? removeCoverById(state.workspace.main, workspaceId)
+					: state.workspace.main,
+			},
+		}));
+	},
+
 	updateSavingContent: (savingStateObj) => {
 		set((state) => ({
 			...state,
@@ -194,6 +226,43 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 				axonverse: axonverseWorkspaces,
 			},
 		}));
+	},
+
+	blogIdOperation: (
+		workspaceId: string,
+		blogId: string,
+		workspaceType: "axonverse" | "main",
+		operation: "add" | "remove",
+	) => {
+		if (workspaceType === "main") {
+			set((state) => ({
+				workspace: {
+					...state.workspace,
+					main: state.workspace.main
+						? blogIdOperationById(
+								state.workspace.main,
+								workspaceId,
+								blogId,
+								operation,
+							)
+						: state.workspace.main,
+				},
+			}));
+		} else {
+			set((state) => ({
+				workspace: {
+					...state.workspace,
+					axonverse: state.workspace.axonverse
+						? blogIdOperationById(
+								state.workspace.axonverse,
+								workspaceId,
+								blogId,
+								operation,
+							)
+						: state.workspace.axonverse,
+				},
+			}));
+		}
 	},
 
 	updateWorkspaceTitleById: (
@@ -399,6 +468,7 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 			parentPageId: null,
 			privileges: null,
 			createdBy: userId,
+			blogId: null,
 			content: null,
 			subPages: [],
 		};
@@ -448,9 +518,11 @@ export const useWorkspaceStore = create<IUserWorkspaceStore>((set) => ({
 			createdBy: userId,
 			parentPageId: workspaceId,
 			privileges: null,
+			blogId: null,
 			content: null,
 			subPages: [],
 		};
+
 		if (workspaceType === "main") {
 			set((state) => ({
 				workspace: {
@@ -764,6 +836,28 @@ const updateWorkspaceIconById = (
 	});
 };
 
+const removeCoverById = (
+	workspaces: IUserWorkspace[],
+	workspaceId: string,
+): IUserWorkspace[] => {
+	return workspaces.map((workspace) => {
+		if (workspace._id === workspaceId) {
+			return {
+				...workspace,
+				cover: undefined,
+			};
+		}
+
+		if (workspace.subPages) {
+			return {
+				...workspace,
+				subPages: removeCoverById(workspace.subPages, workspaceId),
+			};
+		}
+		return workspace;
+	});
+};
+
 const updateWorkspaceTitleById = (
 	workspaces: IUserWorkspace[],
 	workspaceId: string,
@@ -811,6 +905,34 @@ const updateWorkspaceWidthById = (
 					workspace.subPages,
 					workspaceId,
 					workspaceWidth,
+				),
+			};
+		}
+		return workspace;
+	});
+};
+const blogIdOperationById = (
+	workspaces: IUserWorkspace[],
+	workspaceId: string,
+	blogId: string,
+	operation: "add" | "remove",
+): IUserWorkspace[] => {
+	return workspaces.map((workspace) => {
+		if (workspace._id === workspaceId) {
+			return {
+				...workspace,
+				blogId: operation === "add" ? blogId : null,
+			};
+		}
+
+		if (workspace.subPages) {
+			return {
+				...workspace,
+				subPages: blogIdOperationById(
+					workspace.subPages,
+					workspaceId,
+					blogId,
+					operation,
 				),
 			};
 		}

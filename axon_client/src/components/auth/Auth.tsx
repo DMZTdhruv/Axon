@@ -1,21 +1,26 @@
 "use client";
 
-import { useAuthStore } from "@/stores/auth";
-import { useRouter } from "next/navigation";
+import useLogout from "@/hooks/use-logout";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const Auth = () => {
-	const { user } = useAuthStore();
 	const router = useRouter();
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-	useEffect(() => {
+	const pathName = usePathname();
+	const { logout } = useLogout();
+	const handleLogout = async () => {
 		const authUser = localStorage.getItem("axon_user");
 		if (!authUser) {
-			router.push("/auth/sign-in");
-			return;
+			const res = await logout();
+			if (res) {
+				router.push("/auth/sign-in");
+			}
 		}
-	}, []);
+	};
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	useEffect(() => {
+		handleLogout();
+	}, [pathName]);
 	return null;
 };
 

@@ -3,6 +3,7 @@ import type { AxonError } from "@/types";
 import axios from "axios";
 import { toast } from "sonner";
 
+// Interfaces for the response and request data for creating a parent workspace
 export interface CreateParentWorkspaceResponse {
 	statusCode: number;
 	message: string;
@@ -29,9 +30,11 @@ const createParentWorkspace = ({
 		workspace,
 		createdBy,
 	};
+
+	// Send POST request to create the workspace
 	axios
 		.post(
-			"http://localhost:3001/api/workspace/new",
+			`${process.env.NEXT_PUBLIC_API_URL}/api/workspace/new`,
 			workspaceData,
 			{
 				withCredentials: true,
@@ -41,7 +44,7 @@ const createParentWorkspace = ({
 			console.log(data);
 		})
 		.catch((error: AxonError) => {
-			removeWorkspace(_id, workspace);
+			removeWorkspace(_id, workspace); // Revert workspace on error
 			console.error("Error creating workspace:", error.message);
 			toast.error("Failed to create new workspace", {
 				description: `Failed to create the workspace with id: ${_id}`,
@@ -54,6 +57,7 @@ const createParentWorkspace = ({
 		});
 };
 
+// Hook to expose the createParentWorkspace function
 const useCreateNewParentWorkspace = () => {
 	return { createParentWorkspace };
 };

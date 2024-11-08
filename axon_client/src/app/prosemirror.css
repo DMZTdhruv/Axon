@@ -4,8 +4,20 @@
 	@apply my-2 leading-snug;
 }
 
+.blog.ProseMirror > * {
+	@apply my-2 leading-10;
+}
+
 .prose {
 	@apply text-base
+}
+
+.ProseMirror a {
+	color:rgb(100, 100, 100)
+}
+
+.ProseMirror a:hover{
+	color:rgb(143, 143, 143)
 }
 
 .ProseMirror {

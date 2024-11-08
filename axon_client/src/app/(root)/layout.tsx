@@ -23,6 +23,7 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body className={`${inter.className} text-white flex`}>
+				{/* top loader to show the loading of page */}
 				<NextTopLoader
 					color="#ffffff"
 					shadow="0 4px 20px #ffffff"
@@ -34,8 +35,8 @@ export default function RootLayout({
 					easing="ease"
 					speed={200}
 					template='<div class="bar" role="bar"><div class="peg"></div></div> 
-  <div class="spinner" role="spinner"><div class="spinner-icon"></div></div>'
-					zIndex={1600}
+					<div class="spinner" role="spinner"><div class="spinner-icon"></div></div>'
+					zIndex={10000000000000}
 					showAtBottom={false}
 				/>
 

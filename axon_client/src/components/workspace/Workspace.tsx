@@ -3,10 +3,9 @@
 import { useWorkspaceStore, type IUserWorkspace } from "@/stores/workspace";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { MouseEvent, MouseEventHandler, useRef, useState } from "react";
 import { BsThreeDots } from "react-icons/bs";
 import { IoIosArrowForward } from "react-icons/io";
-import WorkspaceModal from "./workspaceModal";
 import { IoIosAdd } from "react-icons/io";
 import { useAuthStore } from "@/stores/auth";
 import useCreateNewSubParentWorkspace from "@/hooks/workspace/useCreateParentSubWorkspace";
@@ -15,6 +14,7 @@ const DynamicIcon = dynamic(() => import("../ui/DynamicIcon"), {
 	ssr: false,
 });
 
+const DynamicWorkspaceModal = dynamic(() => import("./workspaceModal"));
 const Workspace = ({ workspaceLink }: { workspaceLink: IUserWorkspace }) => {
 	const [openFolder, setOpenFolder] = useState<boolean>(false);
 	const path = usePathname();
@@ -22,9 +22,27 @@ const Workspace = ({ workspaceLink }: { workspaceLink: IUserWorkspace }) => {
 	const [openModal, setOpenModal] = useState<boolean>(false);
 	const { addNewSubWorkspaceById, addNewRecentWorkspace, removeWorkspace } =
 		useWorkspaceStore();
+
 	const { createSubParentWorkspace } = useCreateNewSubParentWorkspace();
 	const router = useRouter();
 	const { user } = useAuthStore();
+
+	const [modalPosition, setModalPosition] = useState({
+		x: 0,
+		y: 0,
+	});
+	const bsThreeDotsRef = useRef<HTMLDivElement>(null);
+	const handleModalOperation = (e: React.MouseEvent<SVGElement>) => {
+		if (!bsThreeDotsRef.current) return;
+		const { top, left } = bsThreeDotsRef.current.getBoundingClientRect();
+
+		setModalPosition({
+			x: window.innerWidth < 500 ? left - 200 : left - 200,
+			y: window.innerHeight < top + 300 ? top - 275 : top,
+		});
+
+		setOpenModal(() => true);
+	};
 
 	const addNewSubWorkspace = () => {
 		if (!user?._id) return;
@@ -49,94 +67,98 @@ const Workspace = ({ workspaceLink }: { workspaceLink: IUserWorkspace }) => {
 	};
 
 	return (
-		<div
-			key={workspaceLink._id}
-			className="flex animate-in rounded-[8px] fade-in-0 justify-center relative z-[10] flex-col gap-[15px]"
-		>
-			<div
-				className={` flex select-none group cursor-pointer items-center justify-between text-[13px] ${isActive ? "opacity-100" : "opacity-60"} hover:opacity-100 transition-all  gap-[10px]`}
-			>
-				<div className="flex items-center gap-[10px]">
-					<div className="relative hover:bg-neutral-900  transition-all rounded-md w-[17px] h-[17px]">
-						{/* <img
-							width={17}
-							height={17}
-							className="absolute opacity-100 group-hover:opacity-0 transition-all top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
-							src={`/assets/${workspaceLink.icon}`}
-							alt={`icon_${workspaceLink.title}`}
-						/> */}
-						<DynamicIcon
-							name={workspaceLink.icon}
-							height={17}
-							width={17}
-							DClassName="absolute opacity-100 group-hover:opacity-0 transition-all top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
-						/>
-						{/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-						<div
-							className={`absolute 
-								${openFolder ? "rotate-90" : "rotate-0"}
-								opacity-0 group-hover:opacity-100 transition-all top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]`}
-							onClick={() => setOpenFolder((prev) => !prev)}
-						>
-							<IoIosArrowForward />
-						</div>
-					</div>
-					<Link
-						href={`/workspace/${workspaceLink.workspace}/${workspaceLink._id}`}
-						className="hover:underline leading-[0%]"
-						onClick={() => {
-							addNewRecentWorkspace(
-								workspaceLink._id,
-								workspaceLink.workspace,
-								workspaceLink.title ? workspaceLink.title : "undefined",
-								workspaceLink.icon ? workspaceLink.icon : "axon_logo.svg",
-								workspaceLink.cover ? workspaceLink.cover : "",
-							);
-						}}
-					>
-						{workspaceLink.title
-							? workspaceLink.title.length > 18
-								? `${workspaceLink.title.substring(0, 10)}...`
-								: workspaceLink.title
-							: "untitled"}
-					</Link>
-				</div>
-				<div className="flex gap-1">
-					<button
-						type="button"
-						className="opacity-0 relative active:scale-90 group-hover:opacity-100  hover:bg-neutral-900 p-[3px]  rounded-md"
-						onClick={addNewSubWorkspace}
-					>
-						<IoIosAdd />
-					</button>
-					<div className="opacity-0 relative active:scale-90 group-hover:opacity-100 p-[3px] hover:bg-neutral-900  rounded-md">
-						<BsThreeDots onClick={() => setOpenModal((prev) => !prev)} />
-					</div>
-				</div>
-			</div>
+		<>
 			{openModal && user?._id && (
-				<WorkspaceModal
+				<DynamicWorkspaceModal
 					workspaceId={workspaceLink._id}
 					setModal={setOpenModal}
 					userId={user?._id}
 					workspaceType={workspaceLink.workspace}
+					top={modalPosition.y}
+					left={modalPosition.x}
 				/>
 			)}
-			{openFolder &&
-				(workspaceLink?.subPages && workspaceLink?.subPages?.length !== 0 ? (
-					openFolder && (
-						<div className="flex ml-2 border-l-2 pl-2 border-neutral-800 flex-col gap-[15px]">
-							{workspaceLink?.subPages?.map((subPage) => {
-								return (
-									<WorkspaceFolder key={subPage._id} workspaceLink={subPage} />
-								);
-							})}
+			<div
+				key={workspaceLink._id}
+				className="flex animate-in rounded-[8px] fade-in-0 justify-center relative z-[10000000] flex-col gap-[15px]"
+			>
+				<div
+					className={` flex select-none relative z-[10] group cursor-pointer items-center justify-between text-[13px] ${isActive ? "opacity-100" : "opacity-60"} hover:opacity-100 transition-all  gap-[10px]`}
+				>
+					<div className="flex items-center gap-[10px]">
+						<div className="relative hover:bg-neutral-900  transition-all rounded-md w-[17px] h-[17px]">
+							<DynamicIcon
+								name={workspaceLink.icon}
+								height={17}
+								width={17}
+								DClassName="absolute opacity-100 group-hover:opacity-0 transition-all top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
+							/>
+							{/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+							<div
+								className={`absolute 
+								${openFolder ? "rotate-90" : "rotate-0"}
+								opacity-0 group-hover:opacity-100 transition-all top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]`}
+								onClick={() => setOpenFolder((prev) => !prev)}
+							>
+								<IoIosArrowForward />
+							</div>
 						</div>
-					)
-				) : (
-					<p className="text-[13px] pl-3 opacity-35">No pages here</p>
-				))}
-		</div>
+						<Link
+							href={`/workspace/${workspaceLink.workspace}/${workspaceLink._id}`}
+							className="hover:underline leading-[0%]"
+							onClick={() => {
+								addNewRecentWorkspace(
+									workspaceLink._id,
+									workspaceLink.workspace,
+									workspaceLink.title ? workspaceLink.title : "undefined",
+									workspaceLink.icon ? workspaceLink.icon : "axon_logo.svg",
+									workspaceLink.cover ? workspaceLink.cover : "",
+								);
+							}}
+						>
+							{workspaceLink.title
+								? workspaceLink.title.length > 18
+									? `${workspaceLink.title.substring(0, 10)}...`
+									: workspaceLink.title
+								: "untitled"}
+						</Link>
+					</div>
+					<div className="flex gap-1">
+						<button
+							type="button"
+							className="md:opacity-0 relative active:scale-90 group-hover:opacity-100  hover:bg-neutral-900 p-[3px]  rounded-md"
+							onClick={addNewSubWorkspace}
+						>
+							<IoIosAdd />
+						</button>
+						<div
+							ref={bsThreeDotsRef}
+							className="md:opacity-0 relative active:scale-90 group-hover:opacity-100 p-[3px] hover:bg-neutral-900  rounded-md"
+						>
+							<BsThreeDots onClick={handleModalOperation} />
+						</div>
+					</div>
+				</div>
+
+				{openFolder &&
+					(workspaceLink?.subPages && workspaceLink?.subPages?.length !== 0 ? (
+						openFolder && (
+							<div className="flex ml-2 border-l-2 pl-2 border-neutral-800 flex-col gap-[15px]">
+								{workspaceLink?.subPages?.map((subPage) => {
+									return (
+										<WorkspaceFolder
+											key={subPage._id}
+											workspaceLink={subPage}
+										/>
+									);
+								})}
+							</div>
+						)
+					) : (
+						<p className="text-[13px] pl-3 opacity-35">No pages here</p>
+					))}
+			</div>
+		</>
 	);
 };
 
@@ -156,6 +178,23 @@ const WorkspaceFolder = ({
 	const router = useRouter();
 	const { user } = useAuthStore();
 
+	const [modalPosition, setModalPosition] = useState({
+		x: 0,
+		y: 0,
+	});
+	const bsThreeDotsRef = useRef<HTMLDivElement>(null);
+	const handleModalOperation = () => {
+		if (!bsThreeDotsRef.current) return;
+		const { top, left } = bsThreeDotsRef.current.getBoundingClientRect();
+
+		setModalPosition({
+			x: left,
+			y: window.innerHeight < top + 300 ? top - 285 : top,
+		});
+
+		setOpenModal((prev) => !prev);
+	};
+
 	const addNewSubWorkspace = () => {
 		if (!user?._id) return;
 		const { newWorkspaceId, newWorkspaceType, newWorkspaceParentPageId } =
@@ -179,7 +218,7 @@ const WorkspaceFolder = ({
 	};
 
 	return (
-		<div className="flex flex-col  fade-in-0 animate-in gap-[15px]">
+		<div className="flex flex-col fade-in-0 animate-in gap-[15px]">
 			<div
 				key={workspaceLink.title}
 				className={`flex group cursor-pointer items-center justify-between text-[13px] ${isActive ? "opacity-100" : "opacity-60"} hover:opacity-100 transition-all  gap-[10px]`}
@@ -215,7 +254,11 @@ const WorkspaceFolder = ({
 						href={`/workspace/${workspaceLink.workspace}/${workspaceLink._id}`}
 						className="text-nowrap hover:underline "
 					>
-						{workspaceLink.title}
+						{workspaceLink.title
+							? workspaceLink.title.length > 18
+								? `${workspaceLink.title.substring(0, 10)}...`
+								: workspaceLink.title
+							: "untitled"}
 					</Link>
 				</div>
 
@@ -227,17 +270,22 @@ const WorkspaceFolder = ({
 					>
 						<IoIosAdd />
 					</button>
-					<div className="opacity-0 relative active:scale-90 group-hover:opacity-100 p-[3px] hover:bg-neutral-900  rounded-md">
-						<BsThreeDots onClick={() => setOpenModal((prev) => !prev)} />
+					<div
+						ref={bsThreeDotsRef}
+						className="opacity-0 relative active:scale-90 group-hover:opacity-100 p-[3px] hover:bg-neutral-900  rounded-md"
+					>
+						<BsThreeDots onClick={handleModalOperation} />
 					</div>
 				</div>
 			</div>
 			{openModal && user?._id && (
-				<WorkspaceModal
+				<DynamicWorkspaceModal
 					workspaceId={workspaceLink._id}
 					setModal={setOpenModal}
 					userId={user._id}
 					workspaceType={workspaceLink.workspace}
+					top={modalPosition.y}
+					left={modalPosition.x}
 				/>
 			)}
 			{openFolder && (

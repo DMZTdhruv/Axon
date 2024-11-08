@@ -22,7 +22,7 @@ const updateCoverYPosOnServer = async ({
 	workspaceId,
 }: UpdateCoverRequest): Promise<UpdateYPosCoverResponse> => {
 	const response = await axios.post(
-		"http://localhost:3001/api/workspace/cover/yPos/transaction",
+		`${process.env.NEXT_PUBLIC_API_URL}/api/workspace/cover/yPos/transaction`,
 		{
 			yPos,
 			workspaceId,

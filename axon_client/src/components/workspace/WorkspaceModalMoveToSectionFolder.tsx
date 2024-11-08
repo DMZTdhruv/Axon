@@ -1,10 +1,11 @@
 "use client";
 
 import { useWorkspaceStore, type IUserWorkspace } from "@/stores/workspace";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { IoIosArrowForward } from "react-icons/io";
 import WorkspaceModal from "./workspaceModal";
 import usePushWorkspace from "@/hooks/workspace/usePushWorkspace";
+import DynamicIcon from "../ui/DynamicIcon";
 
 const WorkspaceModalMoveToSectionFolder = ({
 	workspaceLink,
@@ -17,9 +18,14 @@ const WorkspaceModalMoveToSectionFolder = ({
 	currentWorkspaceType: "main" | "axonverse";
 	userId: string;
 }) => {
+	// states
 	const [openFolder, setOpenFolder] = useState<boolean>(false);
 	const [openModal, setOpenModal] = useState<boolean>(false);
+
+	// workspace store
 	const { pushWorkspaceToDifferentWorkspace } = useWorkspaceStore();
+
+	// custom hooks to interact with the server
 	const pushToWorkspace = usePushWorkspace();
 
 	const handlePushWorkspace = () => {
@@ -33,8 +39,8 @@ const WorkspaceModalMoveToSectionFolder = ({
 			currentWorkspaceId,
 			toWorkspaceId: workspaceLink._id,
 			toWorkspaceType: workspaceLink.workspace,
-		})
-	}
+		});
+	};
 
 	return (
 		<div
@@ -65,11 +71,11 @@ const WorkspaceModalMoveToSectionFolder = ({
 						type="button"
 						onClick={handlePushWorkspace}
 					>
-						<img
+						<DynamicIcon
 							width={17}
 							height={17}
-							src={`/assets/${workspaceLink.icon}`}
-							alt={`icon_${workspaceLink.title}`}
+							name={workspaceLink.icon}
+							DClassName={"translate-y-[2px]"}
 						/>
 						<span>
 							{workspaceLink.title
@@ -81,14 +87,7 @@ const WorkspaceModalMoveToSectionFolder = ({
 					</button>
 				</div>
 			</button>
-			{openModal && (
-				<WorkspaceModal
-					workspaceId={workspaceLink._id}
-					setModal={setOpenModal}
-					userId={userId}
-					workspaceType={workspaceLink.workspace}
-				/>
-			)}
+
 			{openFolder &&
 				(workspaceLink?.subPages && workspaceLink?.subPages?.length !== 0 ? (
 					openFolder && (
@@ -143,8 +142,8 @@ const WorkspaceMoveToSubFolder = ({
 			currentWorkspaceId,
 			toWorkspaceId: workspaceLink._id,
 			toWorkspaceType: workspaceLink.workspace,
-		})
-	}
+		});
+	};
 	return (
 		<div className="flex flex-col ">
 			<div
@@ -171,11 +170,11 @@ const WorkspaceMoveToSubFolder = ({
 						className="flex flex-1 flex-shrink-0  gap-2"
 						onClick={handlePushWorkspace}
 					>
-						<img
+						<DynamicIcon
 							width={17}
 							height={17}
-							src={`/assets/${workspaceLink.icon}`}
-							alt={`icon_${workspaceLink.title}`}
+							name={workspaceLink.icon}
+							DClassName={"translate-y-[2px]"}
 						/>
 						<span>
 							{workspaceLink.title
@@ -187,14 +186,6 @@ const WorkspaceMoveToSubFolder = ({
 					</button>
 				</div>
 			</div>
-			{openModal && (
-				<WorkspaceModal
-					workspaceId={workspaceLink._id}
-					setModal={setOpenModal}
-					userId={userId}
-					workspaceType={workspaceLink.workspace}
-				/>
-			)}
 			{openFolder && (
 				<div className="flex gap-1 border-neutral-800/ ml-2 flex-col ">
 					{workspaceLink?.subPages && workspaceLink?.subPages?.length !== 0 ? (

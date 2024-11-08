@@ -9,6 +9,11 @@ import dynamic from "next/dynamic";
 const IconModal = dynamic(() => import("./IconModal"), {
 	ssr: false,
 });
+
+import { motion } from "framer-motion";
+import { Trash2 } from "lucide-react";
+import useRemoveCover from "@/hooks/workspace/useRemoveCover";
+
 const DynamicWorkspaceIcon = dynamic(
 	() => import("../ui/DynamicWorkspaceIcon"),
 	{
@@ -22,13 +27,17 @@ const WorkspaceCover = ({
 	const currentWorkspaceTitle = currentWorkspace.title
 		? currentWorkspace.title
 		: "Untitled";
-	const [yPos, setYPos] = useState<number>(currentWorkspace.coverPos);
+
+	// stores
+	const workspace = useWorkspaceStore();
+	const { updateSavingContent, savingContent } = useWorkspaceStore();
+
+	// helper function to upload the cover
 	const { mutate: uploadCover, isPending } = useUploadCover();
 
+	// states
+	const [yPos, setYPos] = useState<number>(currentWorkspace.coverPos);
 	const [openIconModal, setOpenIconModal] = useState<boolean>(false);
-	const [selectedIconSVG, setSelectedIconSVG] = useState("");
-
-	const workspace = useWorkspaceStore();
 
 	const handleSelectedIcon = (icon: string | null) => {
 		workspace.updateWorkspaceIcon(
@@ -38,7 +47,8 @@ const WorkspaceCover = ({
 		);
 	};
 
-	const { updateSavingContent, savingContent } = useWorkspaceStore();
+	const { handleRemoveCoverFromServer } = useRemoveCover();
+
 	const {
 		isError,
 		mutate: updateYCoverPositionOnServer,
@@ -46,18 +56,39 @@ const WorkspaceCover = ({
 		isPending: updatingCoverYPosition,
 	} = useUpdateYCoverPosition();
 
+	const removeCover = () => {
+		const currentCoverImage = currentWorkspace.cover;
+		try {
+			workspace.removeWorkspaceCover(
+				currentWorkspace._id,
+				currentWorkspace.workspace,
+			);
+			handleRemoveCoverFromServer({ workspaceId: currentWorkspace._id });
+		} catch (error) {
+			workspace.updateWorkspaceCover(
+				currentWorkspace._id,
+				currentWorkspace.workspace,
+				currentCoverImage as string,
+			);
+		}
+	};
+
 	const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
 		try {
+			// toggling the saving state
 			updateSavingContent({
 				workspaceId: currentWorkspace._id,
 				workspaceType: currentWorkspace.workspace,
 				savingStatus: true,
 			});
 			const file = event.target.files?.[0];
+
+			// validating data
 			if (!file) {
 				throw new Error("Invalid image.");
 			}
 
+			// uploading the cover
 			uploadCover(
 				{
 					workspaceId: currentWorkspace._id,
@@ -114,6 +145,7 @@ const WorkspaceCover = ({
 				});
 			}
 		} finally {
+			// toggling off the loading
 			updateSavingContent({
 				workspaceId: currentWorkspace._id,
 				workspaceType: currentWorkspace.workspace,
@@ -122,6 +154,7 @@ const WorkspaceCover = ({
 		}
 	};
 
+	// handling YPos
 	const handleTheYPos = (yPos: number) => {
 		setYPos(() => yPos);
 		workspace.updateWorkspaceCoverYPosition(
@@ -149,7 +182,7 @@ const WorkspaceCover = ({
 				<div className="absolute top-0 z-[10] w-full left-0">
 					<div className="h-full relative opacity-0 group-hover:opacity-100 transition-all  w-full">
 						<div className="flex gap-2 absolute top-[24px] right-[24px]">
-							<label className="bg-[#262626]/50 hover:bg-[#262626] backdrop-blur-lg  transition-all cursor-pointer text-[13px] rounded-xl px-[15px] py-[8px]">
+							<label className="bg-[#262626]/50 hover:bg-[#262626] backdrop-blur-lg  transition-all cursor-pointer text-[13px] rounded-md px-[15px] py-[8px]">
 								<input
 									type="file"
 									accept="image/*"
@@ -167,6 +200,15 @@ const WorkspaceCover = ({
 									<span>Upload and image</span>
 								)}
 							</label>
+							{currentWorkspace.cover && (
+								<button
+									onClick={removeCover}
+									type="button"
+									className="p-2 w-fit rounded-sm bg-[#262626]/50 hover:bg-[#262626] backdrop-blur-lg transition-all"
+								>
+									<Trash2 size={13} />
+								</button>
+							)}
 						</div>
 					</div>
 				</div>
@@ -181,7 +223,7 @@ const WorkspaceCover = ({
 						className={
 							"w-full transition-all relative z-[1] h-full object-cover"
 						}
-						style={{ objectPosition: `0px ${yPos}%` }}
+						style={{ objectPosition: `50% ${yPos}%` }}
 						priority={true}
 						unoptimized
 					/>
@@ -194,7 +236,7 @@ const WorkspaceCover = ({
 				)}
 
 				{/* Limit yPos to stay within 0-100% range */}
-				<div className="absolute items-end opacity-0 group-hover:opacity-100 top-[74px] flex flex-col gap-2 right-[24px] z-[10]">
+				<div className="absolute active:opacity-60 items-end opacity-0 group-hover:opacity-100 top-[74px] flex flex-col gap-2 right-[24px] z-[10]">
 					<button
 						onClick={() =>
 							handleTheYPos(
@@ -202,7 +244,7 @@ const WorkspaceCover = ({
 							)
 						}
 						type="button"
-						className="p-2 w-fit rounded-lg bg-[#262626]/50 hover:bg-[#262626] backdrop-blur-lg transition-all"
+						className="p-2 w-fit rounded-sm active:opacity-60 bg-[#262626]/50 hover:bg-[#262626] backdrop-blur-lg transition-all"
 					>
 						<IoIosArrowUp size={13} />
 					</button>
@@ -213,7 +255,7 @@ const WorkspaceCover = ({
 							)
 						}
 						type="button"
-						className="p-2 w-fit rounded-lg bg-[#262626]/50 hover:bg-[#262626] backdrop-blur-lg transition-all"
+						className="p-2 w-fit active:opacity-60 rounded-sm bg-[#262626]/50 hover:bg-[#262626] backdrop-blur-lg transition-all"
 					>
 						<IoIosArrowDown size={13} />
 					</button>
@@ -221,7 +263,12 @@ const WorkspaceCover = ({
 				<div
 					className={`-translate-y-[83px] pl-[50px] custom-transition-all ${currentWorkspace.workspaceWidth === "sm" ? "w-[958px]  translate-x-[-35px] pl-0" : "w-full"}  mx-auto relative z-1  flex gap-2 items-end z-[10]`}
 				>
-					<div className="relative">
+					<motion.div
+						className="relative"
+						initial={{ opacity: 0, x: -10 }}
+						animate={{ opacity: 1, x: 0 }}
+						transition={{ duration: 0.3, ease: "easeInOut" }}
+					>
 						<button
 							type="button"
 							onClick={() => setOpenIconModal((prev) => !prev)}
@@ -238,13 +285,23 @@ const WorkspaceCover = ({
 						</button>
 						<div className="absolute ">
 							{openIconModal && (
-								<IconModal handleSelectedIcon={handleSelectedIcon} workspaceId={currentWorkspace._id} currentIcon={currentWorkspace.icon} />
+								<IconModal
+									handleSelectedIcon={handleSelectedIcon}
+									workspaceId={currentWorkspace._id}
+									currentIcon={currentWorkspace.icon}
+									setIconModal={setOpenIconModal}
+								/>
 							)}
 						</div>
-					</div>
-					<div className="flex flex-col">
-						<div className="text-[13px] relative inline-block leading-loose ">
-							Welcome to
+					</motion.div>
+					<motion.div
+						className="flex flex-col"
+						initial={{ opacity: 0, x: -10 }}
+						animate={{ opacity: 1, x: 0 }}
+						transition={{ duration: 0.3, ease: "easeInOut" }}
+					>
+						<div className="text-[13px] translate-y-1 translate-x-1 relative inline-block leading-loose ">
+							<span className="opacity-60">Welcome to</span>
 							<img
 								src="/assets/curve_line.svg"
 								className="absolute top-[65%] -translate-y-[50%] -left-[20px]"
@@ -256,7 +313,7 @@ const WorkspaceCover = ({
 						>
 							{currentWorkspaceTitle}
 						</h1>
-					</div>
+					</motion.div>
 				</div>
 			</div>
 		</div>

@@ -20,17 +20,17 @@ interface UploadCoverRequest {
 const uploadCover = async (
 	data: UploadCoverRequest,
 ): Promise<UploadCoverResponse> => {
-	const formData = new FormData();
-	formData.append("workspaceId", data.workspaceId);
-	formData.append("image", data.file);
+	const formData = new FormData(); // Create a new FormData object
+	formData.append("workspaceId", data.workspaceId); // Append workspace ID to form data
+	formData.append("image", data.file); // Append the image file to form data
 
 	const response = await axios.post(
-		"http://localhost:3001/api/workspace/cover/upload/transaction",
+		`${process.env.NEXT_PUBLIC_API_URL}/api/workspace/cover/upload/transaction`,
 		formData,
 		{
 			withCredentials: true,
 			headers: {
-				"Content-Type": "multipart/form-data",
+				"Content-Type": "multipart/form-data", // Set content type for file upload
 			},
 		},
 	);
@@ -40,7 +40,7 @@ const uploadCover = async (
 
 const useUploadCover = () => {
 	return useMutation<UploadCoverResponse, AxonError, UploadCoverRequest>({
-		mutationFn: uploadCover,
+		mutationFn: uploadCover, // The function to call for the mutation,
 	});
 };
 

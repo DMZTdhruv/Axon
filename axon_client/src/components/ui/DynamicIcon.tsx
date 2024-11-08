@@ -14,13 +14,12 @@ const DynamicIcon = ({ name, width, height, DClassName }: DynamicIconProps) => {
 	// @ts-ignore
 	const IconComponent = Icons[name];
 	if (IconComponent === null || IconComponent === undefined)
-
 		return (
 			<Image
 				alt="workspace_icon"
 				src={"/assets/axon_logo.svg"}
-				height={25}
-				width={25}
+				height={18}
+				width={18}
 				draggable={false}
 				className={cn(DClassName)}
 			/>

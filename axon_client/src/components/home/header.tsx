@@ -5,10 +5,14 @@ import { useUserStore } from "@/stores/user";
 import Image from "next/image";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { Skeleton } from "../ui/skeleton";
+import { BsLayoutSidebar } from "react-icons/bs";
+import { FiSidebar } from "react-icons/fi";
+import { useWorkspaceStore } from "@/stores/workspace";
 
 const Header = () => {
 	const user = useUserStore();
 	const { isAuthenticated } = useAuthStore();
+	const { openNavHandler } = useWorkspaceStore();
 	if (!isAuthenticated) {
 		return <Skeleton className="w-full h-[289px] bg-neutral-900" />;
 	}
@@ -16,6 +20,10 @@ const Header = () => {
 	return (
 		<section>
 			<div className="h-[309px] group transition-all relative w-full ">
+				<button className="absolute hover:bg-neutral-800/20 hover:backdrop-blur-md p-2 rounded-md top-4 group left-4 z-[100]">
+					<FiSidebar height={30} width={30} onClick={openNavHandler} className="active:scale-90"/>
+				</button>
+
 				<div className=" fade-in-0 animate-in relative w-full h-full">
 					<div className="bg-gradient-to-b from-slate-50/0 via-[#0F0F0F]/60 to-[#0F0F0F] to-[93%] h-full w-full select-none absolute z-[5] top-0 left-0" />
 

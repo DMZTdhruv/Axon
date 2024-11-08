@@ -10,7 +10,7 @@ import {
 	EditorBubble,
 	type EditorInstance,
 } from "novel";
-import { ImageResizer, handleCommandNavigation } from "novel/extensions";
+import { handleCommandNavigation, ImageResizer } from "novel/extensions";
 import { useDebouncedCallback } from "use-debounce";
 import ReactDom from "react-dom/server";
 import { Separator } from "@/components/ui/separator";
@@ -21,10 +21,9 @@ import { LinkSelector } from "./selectors/link-selector";
 import { TextButtons } from "./selectors/text-button";
 import { ColorSelector } from "./selectors/color-selector";
 import { type IUserWorkspace, useWorkspaceStore } from "@/stores/workspace";
-import { Code } from "lucide-react";
+import { Code, Image } from "lucide-react";
 import { Button } from "../ui/button";
 import axios from "axios";
-
 import ReactMarkdown from "react-markdown";
 import useUpdateWorkspaceContent from "@/hooks/workspace/useUpdateWorkspaceContent";
 import useGetWorkspaceContent from "@/hooks/workspace/useGetContent";
@@ -40,11 +39,8 @@ interface EditorProp {
 	currentWorkspace: IUserWorkspace;
 	initialValue?: string;
 }
-const AxonEditor = ({
-	initialValue,
-	currentWorkspace,
-	workspaceId,
-}: EditorProp) => {
+
+const AxonEditor = ({ currentWorkspace, workspaceId }: EditorProp) => {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [openNode, setOpenNode] = useState(false);
 	const [openColor, setOpenColor] = useState(false);
@@ -57,8 +53,6 @@ const AxonEditor = ({
 		addNewParentWorkspace,
 		updateSavingContent,
 		updateWorkspaceContent,
-		workspace,
-		savingContent,
 	} = useWorkspaceStore();
 	const { createParentWorkspace } = useCreateNewParentWorkspace();
 	const { updateWorkspaceContentOnServer } = useUpdateWorkspaceContent();
@@ -66,6 +60,7 @@ const AxonEditor = ({
 	const { user } = useAuthStore();
 	const router = useRouter();
 
+	// using debounced state update as we don't want the react to render every time we type something
 	const debouncedUpdates = useDebouncedCallback(
 		async (editor: EditorInstance) => {
 			updateSavingContent({
@@ -101,17 +96,18 @@ const AxonEditor = ({
 		setWorkspaceContent();
 	}, []);
 
+	// function to update the workspace content
 	const setWorkspaceContent = async () => {
 		if (currentWorkspace.content !== null) {
 			setLoading(true);
 			console.log(currentWorkspace.content);
 			const response = await fetchWorkspaceContent(workspaceId);
-			const content = response.data?.content ? response.data.content : null;
+			const content = response?.data?.content ? response.data.content : null;
 			updateWorkspaceContent(workspaceId, currentWorkspace.workspace, content);
 			setLoading(false);
 		}
 	};
-	
+
 	const handleAddWorkspace = (workspaceType: "main" | "axonverse") => {
 		if (!user?._id) return;
 		const { newWorkspaceId, newWorkspaceType } = addNewParentWorkspace(
@@ -127,6 +123,7 @@ const AxonEditor = ({
 		router.push(`/workspace/${newWorkspaceType}/${newWorkspaceId}`);
 	};
 
+	// showing workspace loader
 	if (loading) {
 		return <WorkspaceLoader />;
 	}
@@ -134,16 +131,14 @@ const AxonEditor = ({
 	return (
 		<div
 			spellCheck="false"
-			className={`rounded-xl ${currentWorkspace.workspaceWidth === "sm" ? "w-[1024px]" : "w-full"} custom-transition-all mx-auto flex relative items-center justify-center px-[50px]`}
+			className={`rounded-xl fade-in-0 animate-in ${currentWorkspace.workspaceWidth === "sm" ? "lg:w-[1024px] w-full" : "w-full"} custom-transition-all mx-auto flex relative items-center justify-center  px-[16px] md:px-[50px]`}
 		>
 			<EditorRoot>
 				<EditorContent
 					immediatelyRender={false}
 					//@ts-ignore
-
 					initialContent={currentWorkspace.content}
 					className={"w-full"}
-					{...(initialValue && { initialContent: initialValue })}
 					extensions={extensions}
 					editorProps={{
 						handleDOMEvents: {
@@ -163,7 +158,6 @@ const AxonEditor = ({
 							savingStatus: true,
 						});
 					}}
-					slotAfter={<ImageResizer />}
 				>
 					<span />
 					<EditorCommand className="z-50 bg-neutral-900/80 backdrop-blur-lg  h-auto max-h-[330px] overflow-y-auto rounded-md border-neutral-800 border-2 px-1 py-2  shadow-md transition-all">
@@ -172,7 +166,7 @@ const AxonEditor = ({
 						</EditorCommandEmpty>
 						<EditorCommandList>
 							<EditorCommandItem
-								value={"Ask ai"}
+								value={"Axon ai"}
 								onCommand={({ editor, range }) => {
 									setOpenAxonAiModal((prev) => !prev);
 									const { view } = editor;
@@ -194,6 +188,43 @@ const AxonEditor = ({
 									<p className="font-medium">Axon AI</p>
 									<p className="text-xs text-muted-foreground">
 										Ask ai to do your tasks.
+									</p>
+								</div>
+							</EditorCommandItem>
+							<EditorCommandItem
+								value={"image"}
+								onCommand={({ editor, range }) => {
+									editor.chain().focus().deleteRange(range).run();
+									const input = document.createElement("input");
+									input.type = "file";
+									input.accept = "image/*";
+									input.onchange = async () => {
+										if (input.files?.length) {
+											const file = input.files[0];
+											const pos = editor.view.state.selection.from;
+											console.log(
+												"Calling uploadFn with file:",
+												file,
+												"and position:",
+												pos,
+											);
+											console.log("hello world");
+											editor.commands.insertAxonImage(file);
+										}
+									};
+									input.click();
+								}}
+								className={
+									"flex  w-full group items-center space-x-2 transition-all cursor-pointer rounded-md px-2 py-1 text-left text-sm hover:bg-neutral-800 aria-selected:bg-neutral-800"
+								}
+							>
+								<div className="flex h-10 bg-neutral-900 w-10 items-center justify-center  rounded-md border-2  border-neutral-700 border-muted bg-background">
+									<Image size={18} />
+								</div>
+								<div>
+									<p className="font-medium">Image</p>
+									<p className="text-xs text-muted-foreground">
+										Add image to your notes
 									</p>
 								</div>
 							</EditorCommandItem>
@@ -277,8 +308,8 @@ const AxonEditor = ({
 
 export default AxonEditor;
 
+// axon ai modal to allow user to type the axon ai
 const AxonAiModal = ({
-	open,
 	onClose,
 	position,
 	editor,

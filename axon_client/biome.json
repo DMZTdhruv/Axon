@@ -20,6 +20,9 @@
 			"bracketSpacing": true,
 			"semicolons": "always",
 			"trailingCommas": "all"
+		},
+		"linter": {
+			"enabled": false
 		}
 	}
 }

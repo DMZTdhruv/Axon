@@ -8,7 +8,6 @@ import {
 	ListOrdered,
 	Text,
 	TextQuote,
-	Image,
 } from "lucide-react";
 import { createSuggestionItems } from "novel/extensions";
 import { Command, renderItems } from "novel/extensions";
@@ -112,49 +111,12 @@ export const suggestionItems = createSuggestionItems([
 				.run(),
 	},
 	{
-		title: "Image",
-		searchTerms: ["image", "picture", "banner", "Image", "Picture", "banner"],
-		icon: <Image size={18} />,
-		description: "Add an image to your page.",
-		command: ({ editor, range }) => {
-			editor.chain().focus().deleteRange(range).run();
-			const element = document.createElement("input");
-			element.type = "file";
-			element.accept = "image/*";
-			element.onchange = () => {
-				if (element.files?.length) {
-					const file = element.files[0];
-					const imageUrl = URL.createObjectURL(file); // You need to implement this function
-					if (imageUrl) {
-						editor.chain().focus().setImage({ src: imageUrl }).run();
-					}
-				}
-			};
-			element.click();
-		},
-	},
-	{
 		title: "Code",
 		description: "Capture a code snippet.",
 		searchTerms: ["codeblock"],
 		icon: <Code size={18} />,
 		command: ({ editor, range }) =>
 			editor.chain().focus().deleteRange(range).toggleCodeBlock().run(),
-	},
-	{
-		title: "New page",
-		description: "Create a new page",
-		searchTerms: [
-			"new workspace",
-			"create workspace",
-			"new page",
-			"page",
-			"workspace",
-		],
-		icon: <Code size={18} />,
-		command: (val) => {
-			console.log(val);
-		},
 	},
 ]);
 

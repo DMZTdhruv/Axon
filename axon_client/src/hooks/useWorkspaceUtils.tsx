@@ -10,6 +10,8 @@ interface IRoutes {
 const useWorkspaceUtils = () => {
 	const workspaces = useWorkspaceStore((state) => state.workspace);
 
+
+	// Recursive function to find a workspace by its ID
 	const findWorkspaceById = (
 		workspaces: IUserWorkspace[],
 		workspaceId: string,
@@ -18,6 +20,8 @@ const useWorkspaceUtils = () => {
 			if (workspace._id === workspaceId) {
 				return workspace;
 			}
+
+			// find in sub pages recursively
 			if (workspace.subPages) {
 				const foundedWorkspace = findWorkspaceById(
 					workspace.subPages,
@@ -31,6 +35,7 @@ const useWorkspaceUtils = () => {
 		return undefined;
 	};
 
+	// Function to find a workspace based on its type (main or axonverse)
 	const findWorkspace = (
 		workspaceId: string,
 		workspaceType: string,
@@ -45,6 +50,7 @@ const useWorkspaceUtils = () => {
 			: undefined;
 	};
 
+	// Recursive function to find a route by its ID
 	const findRouteById = (
 		workspaces: IUserWorkspace[],
 		workspaceId: string,
@@ -76,6 +82,7 @@ const useWorkspaceUtils = () => {
 		return undefined;
 	};
 
+	// Function to find routes based on workspace type
 	const findRoutes = (
 		workspaceId: string,
 		workspaceType: string,
@@ -90,6 +97,7 @@ const useWorkspaceUtils = () => {
 			: undefined;
 	};
 
+	// Function to update the title of a workspace by its ID
 	const updateWorkspaceTitleById = (
 		workspaces: IUserWorkspace[],
 		workspaceId: string,
@@ -103,6 +111,7 @@ const useWorkspaceUtils = () => {
 				};
 			}
 
+			// recursive sub page traversal
 			if (workspace.subPages) {
 				return {
 					...workspace,

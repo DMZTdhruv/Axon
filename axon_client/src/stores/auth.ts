@@ -1,8 +1,9 @@
-import type { TResponse, TUser } from "@/types";
+import type { TResponse } from "@/types";
 import axios, { AxiosError } from "axios";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
+// The shape of the authentication state
 interface AuthState {
 	user: { _id: string; username: string } | null;
 	isAuthenticated: boolean;
@@ -16,8 +17,14 @@ interface AuthState {
 		password: string,
 	) => Promise<boolean>;
 	logout: () => void;
+	setUser:(user: User) => void;
 }
 
+interface User {
+	_id: string,
+	username: string,
+}
+// The authentication store using Zustand with persistence
 export const useAuthStore = create<AuthState>()(
 	persist(
 		(set) => ({
@@ -39,8 +46,9 @@ export const useAuthStore = create<AuthState>()(
 
 				set({ isLoading: true, error: null });
 				try {
+					// Attempt to sign up the user
 					const response = await axios.post<TResponse>(
-						"http://localhost:3001/api/auth/sign-up",
+						`${process.env.NEXT_PUBLIC_API_URL}/api/auth/sign-up`,
 						{ email, username, password },
 						{ withCredentials: true },
 					);
@@ -53,6 +61,7 @@ export const useAuthStore = create<AuthState>()(
 					});
 					return true;
 				} catch (error) {
+					// Handle errors during sign-up
 					if (error instanceof AxiosError) {
 						set({
 							error: error.response?.data.message || "An error occurred",
@@ -71,6 +80,7 @@ export const useAuthStore = create<AuthState>()(
 				}
 			},
 			login: async (email: string, password: string) => {
+				// Validate input
 				if (email.trim() === "" || password.trim() === "") {
 					set({ isLoading: false, error: "Incomplete details" });
 					setTimeout(() => set({ error: null }), 2000);
@@ -79,8 +89,9 @@ export const useAuthStore = create<AuthState>()(
 
 				set({ isLoading: true, error: null });
 				try {
+					// Attempt to log in the user
 					const response = await axios.post<TResponse>(
-						"http://localhost:3001/api/auth/sign-in",
+						`${process.env.NEXT_PUBLIC_API_URL}/api/auth/sign-in`,
 						{ email, password },
 						{ withCredentials: true },
 					);
@@ -108,6 +119,7 @@ export const useAuthStore = create<AuthState>()(
 			logout: () => {
 				set({ user: null, isAuthenticated: false, error: null, message: null });
 			},
+			setUser: (user: User | null) => set({ user }),
 		}),
 		{
 			name: "axon_user",

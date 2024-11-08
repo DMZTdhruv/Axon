@@ -1,17 +1,18 @@
 "use client";
 
-import type { IUserWorkspace } from "@/stores/workspace";
+import { useWorkspaceStore, type IUserWorkspace } from "@/stores/workspace";
 import type { IRoutes } from "@/types";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BsPlus, BsThreeDots } from "react-icons/bs";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import WorkspaceModal from "./workspaceModal";
+import dynamic from "next/dynamic";
+const DynamicWorkspaceModal = dynamic(() => import("./workspaceModal"));
+
 import { useAuthStore } from "@/stores/auth";
-import DynamicIcon from "../ui/DynamicIcon";
 import DynamicTopBarIcon from "../ui/DynamicTopBarIcon";
+import { FiSidebar } from "react-icons/fi";
 
 const WorkspaceTopBar = ({
 	currentWorkspace,
@@ -19,14 +20,54 @@ const WorkspaceTopBar = ({
 }: { currentWorkspace: IUserWorkspace; folders: IRoutes[] }) => {
 	const router = useRouter();
 	const [openModal, setOpenModal] = useState<boolean>(false);
+
+	const { openNavHandler } = useWorkspaceStore();
+
+	const [modalPosition, setModalPosition] = useState({
+		x: 0,
+		y: 0,
+	});
+	const bsThreeDotsRef = useRef<HTMLDivElement>(null);
+	const handleModalOperation = () => {
+		setOpenModal((prev) => !prev);
+		if (!bsThreeDotsRef.current) return;
+		const { top, left } = bsThreeDotsRef.current.getBoundingClientRect();
+		setModalPosition({
+			x: left,
+			y: top,
+		});
+	};
+
+	useEffect(() => {
+		const handleKeyPress = (event: KeyboardEvent) => {
+			if (event.ctrlKey && event.key.toLowerCase() === "b") {
+				event.preventDefault(); // Prevent default browser behavior
+				openNavHandler();
+			}
+		};
+
+		window.addEventListener("keydown", handleKeyPress);
+
+		return () => {
+			window.removeEventListener("keydown", handleKeyPress);
+		};
+	}, [openNavHandler]);
+
 	const { user } = useAuthStore();
 
-	const extraWorkspaces: IUserWorkspace[] = [];
-
 	return (
-		<div className="flex transition-all z-[1000] workspace-top-bar top-0  border-[#262626] sticky gap-[16px] h-[42px] items-center bg-customMain/50">
+		<div className="flex transition-all z-[10000] workspace-top-bar top-0  border-[#262626] sticky gap-[16px] h-[42px] items-center bg-customMain/80">
 			<div className="absolute inset-0 " />
-			<div className="flex ml-2 gap-2">
+			<div className="flex ml-2 gap-2 relative z-[100] pl-2">
+				<button className="hover:bg-neutral-800/20  rounded-md group">
+					<FiSidebar
+						height={30}
+						width={30}
+						onClick={openNavHandler}
+						className="active:scale-90"
+					/>
+				</button>
+
 				<button type="button" className="group">
 					<IoIosArrowBack
 						className=" group-active:scale-90"
@@ -62,11 +103,11 @@ const WorkspaceTopBar = ({
 								>
 									{folder._id === currentWorkspace?._id ? (
 										<span className="hover:underline  shadow_topBar--text ">
-											{folder.title}
+											{folder.title} hehe
 										</span>
 									) : (
 										<span className="text-neutral-300  hover:underline">
-											{folder.title}
+											{folder.title} hehe
 										</span>
 									)}
 									{index !== folders.length - 1 && " /"}
@@ -80,18 +121,20 @@ const WorkspaceTopBar = ({
 						</div>
 					</div>
 				</div>
-				<BsThreeDots
-					className="hover:bg-white hover:text-black cursor-pointer transition-all rounded-[2.5px] hover:shadow_topBar--box"
-					onClick={() => {
-						setOpenModal((prev) => !prev);
-					}}
-				/>
+				<div ref={bsThreeDotsRef}>
+					<BsThreeDots
+						className="hover:bg-white active:opacity-50  hover:text-black cursor-pointer transition-all rounded-[2.5px] hover:shadow_topBar--box"
+						onClick={handleModalOperation}
+					/>
+				</div>
 				{openModal && user?._id && (
-					<WorkspaceModal
+					<DynamicWorkspaceModal
 						workspaceId={currentWorkspace._id}
 						workspaceType={currentWorkspace.workspace}
 						userId={user._id}
 						setModal={setOpenModal}
+						top={modalPosition.y}
+						left={modalPosition.x}
 					/>
 				)}
 			</div>

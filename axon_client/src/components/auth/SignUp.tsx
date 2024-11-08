@@ -27,6 +27,7 @@ const SignUpCard = () => {
 
 	const sendData = async (e: FormEvent) => {
 		e.preventDefault();
+		//using the custom hook for
 		const authenticated = await signUp(email, localUsername, password);
 		if (authenticated) {
 			router.push("/");
@@ -80,26 +81,14 @@ const SignUpCard = () => {
 					</Button>
 				</form>
 				{error && <p className="text-red-500 text-center">{error}</p>}
-				{message !== "" && (
+				{message !== null && (
 					<p className="text-green-500 text-center">Signed up successfully</p>
 				)}
 			</CardContent>
 			<CardContent>
 				<Separator className="bg-neutral-700" />
 			</CardContent>
-			<CardFooter>
-				<Button
-					type="submit"
-					className="w-full relative"
-					variant="axon"
-					disabled={false}
-				>
-					<div className="absolute left-[15px]">
-						<FcGoogle />
-					</div>
-					Sign up with google
-				</Button>
-			</CardFooter>
+			<CardFooter>Kindly remember your password meow :3</CardFooter>
 		</Card>
 	);
 };

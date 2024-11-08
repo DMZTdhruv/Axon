@@ -19,8 +19,9 @@ const useDeleteWorkspace = () => {
 	const queryClient = useQueryClient();
 	const deleteWorkspaceById = async ({ workspaceId }: DeleteWorkspaceTypes) => {
 		try {
+			// Send DELETE request for the specified workspace ID
 			const response = await axios.post<DeleteWorkspaceResponse>(
-				`http://localhost:3001/api/workspace/delete/${workspaceId}`,
+				`${process.env.NEXT_PUBLIC_API_URL}/api/workspace/delete/${workspaceId}`,
 				{},
 				{ withCredentials: true },
 			);
@@ -38,6 +39,7 @@ const useDeleteWorkspace = () => {
 					onClick: () => console.log("closed error notification"),
 				},
 			});
+			// Refetch workspaces to ensure UI stays updated on error
 			queryClient.refetchQueries({ queryKey: ["workspaces"] });
 		}
 	};

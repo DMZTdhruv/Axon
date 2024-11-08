@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Open_Sans } from "next/font/google";
+import { Inter } from "next/font/google";
 
 const open_Sans = Open_Sans({
+	weight: ["300", "400", "500", "600", "700"],
+	subsets: ["latin"],
+	display: "swap",
+});
+
+const inter = Inter({
 	weight: ["300", "400", "500", "600", "700"],
 	subsets: ["latin"],
 	display: "swap",
@@ -20,7 +27,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body className={`${open_Sans.className} text-white bg-customMain flex`}>
+			<body className={`${inter.className} text-white bg-customMain flex`}>
 				{children}
 			</body>
 		</html>

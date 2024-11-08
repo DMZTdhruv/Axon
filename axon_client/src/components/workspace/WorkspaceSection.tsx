@@ -13,7 +13,6 @@ import { toast } from "sonner";
 import type { AxonError } from "@/types";
 import { useRouter } from "next/navigation";
 
-
 const WorkspaceSection = () => {
 	const workspaceStore = useWorkspaceStore();
 	const { allWorkspacesFetched, handleAllWorkspacesLoaded } =
@@ -37,7 +36,7 @@ const WorkspaceSection = () => {
 
 	const fetchWorkspaces = async (): Promise<WorkspaceStore> => {
 		const serverWorkspaces = await axios.get(
-			"http://localhost:3001/api/workspace/workspaces",
+			`${process.env.NEXT_PUBLIC_API_URL}/api/workspace/workspaces`,
 			{
 				withCredentials: true,
 			},
@@ -155,6 +154,7 @@ const WorkspaceSection = () => {
 					</button>
 				)
 			)}
+			<div className="h-[100px] w-full b"/>
 		</>
 	);
 };

@@ -1,13 +1,11 @@
 import {
-	TiptapImage,
 	TiptapLink,
 	TaskList,
 	TaskItem,
 	HorizontalRule,
 	StarterKit,
 	Placeholder,
-	TiptapUnderline,
-	CodeBlockLowlight,
+	TiptapUnderline,	
 } from "novel/extensions";
 import Highlight from "@tiptap/extension-highlight";
 import TipTapColor from "@tiptap/extension-color";
@@ -15,15 +13,10 @@ import TextStyle from "@tiptap/extension-text-style";
 import GlobalDragHandle from "tiptap-extension-global-drag-handle";
 import AutoJoiner from "tiptap-extension-auto-joiner"; // optional
 import Code from "@tiptap/extension-code";
-
 import { cx } from "class-variance-authority";
-// import css from "highlight.js/lib/languages/css"
 
-// const lowlight = createLowlight(all)
-// lowlight.register('html', html)
-// lowlight.register('css', css)
-// lowlight.register('js', js)
-// lowlight.register('ts', ts)
+import { AxonImageExtension } from "./plugins/axon-image-upload";
+import TiptapImage from "./Nodes/TipTapImage";
 
 const tiptapLink = TiptapLink.configure({
 	HTMLAttributes: {
@@ -31,7 +24,7 @@ const tiptapLink = TiptapLink.configure({
 			"text-muted-foreground underline underline-offset-[3px] hover:text-primary transition-colors cursor-pointer",
 		),
 	},
-});
+})
 
 const highlight = Highlight.configure({
 	multicolor: true,
@@ -40,10 +33,6 @@ const highlight = Highlight.configure({
 const color = TipTapColor.configure({
 	types: ["textStyle"],
 });
-
-// const codeBlockLowLight = CodeBlockLowlight.configure({
-// 	lowlight,
-// });
 
 const taskList = TaskList.configure({
 	HTMLAttributes: {
@@ -105,7 +94,9 @@ const starterKit = StarterKit.configure({
 	},
 	code: {
 		HTMLAttributes: {
-			class: cx("rounded-md bg-neutral-900 px-1.5 custom-none-pseudo py-1 font-mono font-medium"),
+			class: cx(
+				"rounded-md bg-neutral-900 px-1.5 custom-none-pseudo py-1 font-mono font-medium",
+			),
 			spellcheck: "false",
 		},
 	},
@@ -131,6 +122,11 @@ export const defaultExtensions = [
 	}),
 	highlight,
 	code,
+	AxonImageExtension.configure({
+		styles: {
+			class: "rounded-md w-[300px] h-auto m-0",
+		},
+	}),
 	TiptapImage,
 	tiptapLink,
 	GlobalDragHandle,

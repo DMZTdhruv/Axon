@@ -9,6 +9,7 @@ const Page = () => {
 					<span>Axon</span>
 				</p>
 				<h1 className="text-3xl font-bold mb-[30px] ">Welcome to axon</h1>
+				{/* rendering sign in card on client side */}
 				<SignInCard />
 			</div>
 		</section>

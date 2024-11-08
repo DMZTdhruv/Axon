@@ -38,10 +38,15 @@ const updateWorkspaceTitle = async ({
 	};
 
 	axios
-		.post("http://localhost:3001/api/workspace/title/transaction", requestBody, {
-			withCredentials: true,
-		})
+		.post(
+			`${process.env.NEXT_PUBLIC_API_URL}/api/workspace/title/transaction`,
+			requestBody,
+			{
+				withCredentials: true,
+			},
+		)
 		.catch((error: AxonError) => {
+			// Revert title on error and show toast notification with details
 			updateWorkspaceTitleById(workspaceId, oldTitle, workspaceType);
 			console.error("Error creating workspace:", error.message);
 			toast.error("Failed to change the name", {

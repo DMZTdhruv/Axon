@@ -10,6 +10,7 @@ const Page = () => {
 					<span>Axon</span>
 				</p>
 				<h1 className="text-3xl font-bold mb-[30px] ">Welcome to axon</h1>
+				{/* rendering sign up card on client side */}
 				<SignUpCard />
 			</div>
 		</section>
@@ -17,6 +18,7 @@ const Page = () => {
 };
 
 const CoolBlurBackground = () => {
+	
 	return (
 		<>
 			<img

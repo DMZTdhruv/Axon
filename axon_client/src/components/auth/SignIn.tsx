@@ -9,7 +9,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -24,7 +23,7 @@ const SignInCard = () => {
 	const [email, setEmail] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
 	const router = useRouter();
-
+	const [signInMessage, setSignInMessage] = useState<string | null>("");
 	// handling submission of data
 	const handleSubmitData = async (e: FormEvent) => {
 		e.preventDefault();
@@ -33,6 +32,18 @@ const SignInCard = () => {
 			router.push("/");
 		}
 	};
+
+	const handleSignInMessage = () => {
+		setSignInMessage(message);
+		setTimeout(() => {
+			setSignInMessage("");
+		}, 1000);
+	};
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	useEffect(() => {
+		handleSignInMessage();
+	}, [message]);
 
 	return (
 		<Card className="px-[20px] border-neutral-700 text-white bg-customMain rounded-[12px] py-[40px] w-[450px]">
@@ -72,8 +83,8 @@ const SignInCard = () => {
 						{isLoading ? "Signing in.." : "Sign in"}
 					</Button>
 					{error && <p className="text-red-500 text-center">{error}</p>}
-					{message !== "" && (
-						<p className="text-green-500 text-center">{message}</p>
+					{signInMessage && (
+						<p className="text-green-500 text-center">{signInMessage}</p>
 					)}
 				</form>
 			</CardContent>
@@ -81,7 +92,8 @@ const SignInCard = () => {
 				<Separator className="bg-neutral-700" />
 			</CardContent>
 			<CardFooter>
-				<Button
+				Kindly remember your password meow :3
+				{/* <Button
 					type="button"
 					className="w-full relative"
 					variant="axon"
@@ -91,7 +103,7 @@ const SignInCard = () => {
 						<FcGoogle />
 					</div>
 					Sign in with Google
-				</Button>
+				</Button> */}
 			</CardFooter>
 		</Card>
 	);

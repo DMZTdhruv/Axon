@@ -10,9 +10,8 @@ import { useWorkspaceStore } from "@/stores/workspace";
 import Link from "next/link";
 import Image from "next/image";
 import { Skeleton } from "../ui/skeleton";
-import useGetWorkspaceContent from "@/hooks/workspace/useGetContent";
-// import Editor from "../Editor/axon_editor";
 
+// dynamically loading heavy editor to load the workspace faster
 const DynamicAxonEditor = dynamic(
 	() => import("@/components/AxonEditor/axonEditor"),
 	{
@@ -37,9 +36,14 @@ const AxonWorkspace = ({
 	const workspaceStore = useWorkspaceStore();
 	const currentWorkspace = findWorkspace(workspaceId, workspaceType);
 
+	// states
 	const [folders, setFolders] = useState<IRoutes[]>([]);
+	
+	// folder refs as we don't want them to render
 	const folderRef = useRef<IRoutes[]>([]);
 
+	// This is a function to show all the parent, parent, and even their parent workspace
+	// kind of similar to a folder path in a terminal like /parent/subParent/workspace
 	const traversePreviousNodes = (node: IRoutes, nodes: IRoutes[]) => {
 		const someList: IRoutes[] = [node, ...nodes];
 		folderRef.current = someList;
@@ -53,6 +57,7 @@ const AxonWorkspace = ({
 		}
 	};
 
+	// if the current workspace exist we execute the traversePreviousNodes function to populate the folder ref :3
 	if (currentWorkspace) {
 		const demoObject: IRoutes = {
 			_id: currentWorkspace._id,
@@ -66,9 +71,12 @@ const AxonWorkspace = ({
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
+		//setting the folder data in a state 
 		setFolders(() => folderRef.current);
 	}, [workspaceStore.workspace]);
 
+
+	// showing loading animations till all the workspaces are fetched
 	if (!workspaceStore.allWorkspacesFetched) {
 		return (
 			<div className="h-screen  w-full ">
@@ -86,6 +94,7 @@ const AxonWorkspace = ({
 		)
 	}
 
+	// Tell user that the current workspace doesn't exists incase not found
 	if (!currentWorkspace) {
 		return (
 			<div className="h-screen gap-3 w-full flex-col flex items-center justify-center">

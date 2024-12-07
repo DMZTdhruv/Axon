@@ -15,6 +15,6 @@ Developing a Notion-like editor with AI features, focusing on minimal designs an
 - **Backend**: Node.js, TypeScript, Redis, Websockets, Blockchain
 - **Database**: MongoDB, Sanity
 
-
-[] update the workspace width property in editor 
-[] Add the option to change the width in the editor through modal# Axon-pvt
+Hey all, I have stopped this project for now because I don't have time to build it.  
+I will build it in my free time.  
+If you are curious how this works, [check out this tweet](https://x.com/dmztDhruv/status/1854036536838472065).
